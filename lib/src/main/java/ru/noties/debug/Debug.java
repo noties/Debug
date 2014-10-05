@@ -5,100 +5,71 @@ import android.util.Log;
 public class Debug {
 
     private static final String THIS_FILE_NAME = "Debug.java";
-    private static final String STARTING_MESSAGE_PATTERN = "%1$s : %2$s() : %3$d";
-    private static final String MESSAGE_PATTERN = "%1$s : %2$s";
+    private static final String STARTING_MESSAGE_PATTERN = "%1$s() : %2$d : ";
+    private static final String TRACE_PATTERN = "%1$s : %2$s() : %3$d";
+    private static final String TRACE_FIRST_LINE = "trace:";
     private static final String EXCEPTION_PATTERN = "Exception: %1$s";
 
     private static boolean isDebug;
-    private static String sTag;
 
     private Debug() {
 
     }
 
-    public static void init(Configuration configuration) {
-        sTag            = configuration.getTag();
-        isDebug         = configuration.isDebug();
+    public static void init(final boolean debug) {
+        isDebug = debug;
     }
 
-    private static String getMessage(String message, Object... args) {
-
-        if (message == null) {
-            message = "";
-        }
-
-        if(args.length == 0) {
-            return String.format(
-                    MESSAGE_PATTERN,
-                    getStartingMessage(),
-                    message
-            );
-        }
-
-        return String.format(
-                MESSAGE_PATTERN,
-                getStartingMessage(),
-                String.format(message, args)
-        );
+    public static Timer newTimer(String name, TimerType type) {
+        return SimpleTimer.newInstance(name, type);
     }
 
-    private static String getStartingMessage() {
-
-        StackTraceElement[] elements = new Throwable().getStackTrace();
-
-        String fileName;
-        int lineNumber;
-        String methodName;
-
-        for(StackTraceElement element: elements) {
-
-            fileName = element.getFileName();
-
-            if(THIS_FILE_NAME.equals(fileName)) {
-                continue;
-            }
-
-            lineNumber = element.getLineNumber();
-            methodName = element.getMethodName();
-
-            return String.format(STARTING_MESSAGE_PATTERN, fileName, methodName, lineNumber);
-        }
-        return "";
+    public static Timer newTimer(String name) {
+        return SimpleTimer.newInstance(name);
     }
 
     public static void trace() {
+        trace(Level.V);
+    }
+
+    public static void trace(Level level) {
 
         if (!isDebug) return;
 
         StackTraceElement[] elements = new Throwable().getStackTrace();
 
         String fileName;
+        String callerTag = null;
         String methodName;
         int lineNumber;
 
-        StringBuilder builder = new StringBuilder();
+        StringBuilder builder = new StringBuilder(TRACE_FIRST_LINE);
 
         for (StackTraceElement element: elements) {
 
             fileName = element.getFileName();
 
-            if( THIS_FILE_NAME.equals(fileName)) {
+            if (THIS_FILE_NAME.equals(fileName)) {
                 continue;
+            }
+
+            if (callerTag == null) {
+                callerTag = fileName;
             }
 
             methodName = element.getMethodName();
             lineNumber = element.getLineNumber();
 
-            builder.append(String.format(STARTING_MESSAGE_PATTERN, fileName, methodName, lineNumber))
-                    .append("\n");
+            builder
+                    .append("\n")
+                    .append(String.format(TRACE_PATTERN, fileName, methodName, lineNumber));
         }
 
-        Log.v(sTag, builder.toString());
+        log(new Message(level, null, callerTag, builder.toString()));
     }
 
     public static void e(Throwable throwable, String message, Object... args) {
-        if (!isDebug) return;
-        Log.e(sTag, getMessage(message, args), throwable);
+        log(Level.E, throwable, message, args);
     }
 
     public static void e(String message,  Object... args) {
@@ -115,8 +86,7 @@ public class Debug {
     }
 
     public static void w(Throwable throwable, String message, Object... args) {
-        if (!isDebug) return;
-        Log.w(sTag, getMessage(message, args), throwable);
+        log(Level.W, throwable, message, args);
     }
 
     public static void w(String message, Object... args) {
@@ -128,8 +98,7 @@ public class Debug {
     }
 
     public static void i(Throwable throwable, String message, Object... args) {
-        if(!isDebug) return;
-        Log.i(sTag, getMessage(message, args), throwable);
+        log(Level.I, throwable, message, args);
     }
 
     public static void i(String message, Object... args) {
@@ -141,8 +110,7 @@ public class Debug {
     }
 
     public static void d(Throwable throwable, String message, Object... args) {
-        if(!isDebug) return;
-        Log.d(sTag, getMessage(message, args), throwable);
+        log(Level.D, throwable, message, args);
     }
 
     public static void d(String message, Object... args) {
@@ -154,8 +122,7 @@ public class Debug {
     }
 
     public static void v(Throwable throwable, String message, Object... args) {
-        if(!isDebug) return;
-        Log.v(sTag, getMessage(message, args), throwable);
+        log(Level.V, throwable, message, args);
     }
 
     public static void v(String message, Object... args) {
@@ -164,5 +131,130 @@ public class Debug {
 
     public static void v() {
         v(null);
+    }
+
+    static String getLogMessage(String message, Object... args) {
+        if (message == null) {
+            return "";
+        }
+
+        if (args == null || args.length == 0) {
+            return message;
+        }
+
+        return String.format(message, args);
+    }
+
+    private static Holder getHolder(String message, Object... args) {
+
+        final StackTraceElement[] elements = new Throwable().getStackTrace();
+
+        String fileName;
+        String methodName;
+
+        int lineNumber;
+
+        for(StackTraceElement element: elements) {
+
+            fileName = element.getFileName();
+
+            if(THIS_FILE_NAME.equals(fileName)) {
+                continue;
+            }
+
+            lineNumber = element.getLineNumber();
+            methodName = element.getMethodName();
+
+            final String startingMessage
+                    = String.format(STARTING_MESSAGE_PATTERN, methodName, lineNumber);
+            final String logMessage = getLogMessage(message, args);
+
+            return new Holder(fileName, startingMessage + logMessage);
+        }
+
+        return null;
+    }
+
+    private static Message getMessage(
+            final Level level,
+            final Throwable throwable,
+            final String message,
+            final Object... args
+    ) {
+
+        final Holder holder = getHolder(message, args);
+        if (holder == null) {
+            return null;
+        }
+
+        return new Message(level, throwable, holder.getTag(), holder.getMessage());
+    }
+
+    private static void log(
+            final Level level,
+            final Throwable throwable,
+            final String message,
+            final Object... args
+    ) {
+
+        if (!isDebug) {
+            return;
+        }
+
+        final Message m = getMessage(level, throwable, message, args);
+
+        log(m);
+    }
+
+    private static void log(Message message) {
+
+        if (message == null) {
+            return;
+        }
+
+        switch (message.getLevel()) {
+
+            case E:
+                Log.e(message.getTag(), message.getMessage(), message.getThrowable());
+                break;
+
+            case W:
+                Log.w(message.getTag(), message.getMessage(), message.getThrowable());
+                break;
+
+            case I:
+                Log.i(message.getTag(), message.getMessage(), message.getThrowable());
+                break;
+
+            case D:
+                Log.d(message.getTag(), message.getMessage(), message.getThrowable());
+                break;
+
+            case V:
+                Log.v(message.getTag(), message.getMessage(), message.getThrowable());
+                break;
+
+            default:
+                Log.wtf(message.getTag(), message.getMessage(), message.getThrowable());
+        }
+    }
+
+    private static class Holder {
+
+        private final String tag;
+        private final String message;
+
+        private Holder(String tag, String message) {
+            this.tag     = tag;
+            this.message = message;
+        }
+
+        public String getTag() {
+            return tag;
+        }
+
+        public String getMessage() {
+            return message;
+        }
     }
 }

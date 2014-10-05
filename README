@@ -1,0 +1,35 @@
+10-05 23:13:53.599  12379-12379/ru.noties.debug.sample V/MainActivity.java﹕ trace:
+    MainActivity.java : onCreate() : 16
+    Activity.java : performCreate() : 5231
+    Instrumentation.java : callActivityOnCreate() : 1087
+    ActivityThread.java : performLaunchActivity() : 2148
+    ActivityThread.java : handleLaunchActivity() : 2233
+    ActivityThread.java : access$800() : 135
+    ActivityThread.java : handleMessage() : 1196
+    Handler.java : dispatchMessage() : 102
+    Looper.java : loop() : 136
+    ActivityThread.java : main() : 5001
+    Method.java : invoke() : -2
+    ZygoteInit.java : run() : 785
+    ZygoteInit.java : main() : 601
+
+10-05 23:13:53.599  12379-12379/ru.noties.debug.sample I/MainActivity.java﹕ someMethod() : 26 : x: 1, x2: 5, y: Hello!
+
+10-05 23:13:53.599  12379-12379/ru.noties.debug.sample E/MainActivity.java﹕ someMethodWithException() : 33 : Exception: java.lang.AssertionError: This is exception
+    java.lang.AssertionError: This is exception
+            at ru.noties.debug.sample.MainActivity.someMethodWithException(MainActivity.java:31)
+            at ru.noties.debug.sample.MainActivity.onCreate(MainActivity.java:20)
+            at android.app.Activity.performCreate(Activity.java:5231)
+            at android.app.Instrumentation.callActivityOnCreate(Instrumentation.java:1087)
+            at android.app.ActivityThread.performLaunchActivity(ActivityThread.java:2148)
+            at android.app.ActivityThread.handleLaunchActivity(ActivityThread.java:2233)
+            at android.app.ActivityThread.access$800(ActivityThread.java:135)
+            at android.app.ActivityThread$H.handleMessage(ActivityThread.java:1196)
+            at android.os.Handler.dispatchMessage(Handler.java:102)
+            at android.os.Looper.loop(Looper.java:136)
+            at android.app.ActivityThread.main(ActivityThread.java:5001)
+            at java.lang.reflect.Method.invoke(Native Method)
+            at com.android.internal.os.ZygoteInit$MethodAndArgsCaller.run(ZygoteInit.java:785)
+            at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:601)
+
+10-05 23:13:53.599  12379-12379/ru.noties.debug.sample W/MainActivity.java﹕ simpleMethod() : 38 :
