@@ -129,6 +129,7 @@ Output:
 ```
 
 * Timer with millis & nanos
+
 *see sample application for code*
 
 Output millis:
