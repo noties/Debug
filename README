@@ -1,5 +1,65 @@
+## Debug - Android logging tool
 
+### Why?
+* Lightweight
+* Simple
+* Powerful
 
+Debug library provides a lot of useful information. For ex., Java file name as tag,
+method name and a line number where Debug function was called.
+
+Also, it wraps String.format(), so you can create any message with nearly any quantity of variables to check at almost to pain (and time).
+
+### How to do it
+
+```java
+Debug.i();
+Debug.v("My message");
+Debug.w("x: %d, y: %d, z: %s", 1, 72, .0F);
+Debug.d(new Throwable(), "mLastItemIndex: %d", mLastItemIndex);
+Debug.e(new Throwable());
+```
+
+### Installation
+Maven:
+```
+<dependency>
+  <groupId>ru.noties.debug</groupId>
+  <artifactId>debug</artifactId>
+  <version>1.1.0-SNAPSHOT</version>
+  <type>aar</type>
+</dependency>
+```
+
+Gradle:
+```
+compile 'ru.noties.debug:1.1.0'
+```
+
+The best place to initialise Debug library is an Application's onCreate() method.
+Debug.init() takes a boolean indicating whether logging should be done or skipped.
+
+```java
+public class DebugApplication extends Application {
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+
+        Debug.init(BuildConfig.DEBUG);
+    }
+}
+```
+
+### Usage
+
+* Trace method calls till current method
+```java
+Debug.trace();
+```
+
+Output:
+```
 10-05 23:57:42.029  13412-13412/ru.noties.debug.sample V/MainActivity.java﹕ trace:
     MainActivity.java : onCreate() : 20
     Activity.java : performCreate() : 5231
@@ -14,9 +74,42 @@
     Method.java : invoke() : -2
     ZygoteInit.java : run() : 785
     ZygoteInit.java : main() : 601
+```
 
+* All Android Log levels
+
+```java
+Debug.i("x: %d, x2: %d, y: %s", x, x2, y);
+Debug.w();
+Debug.e("ok");
+```
+
+Output:
+```
 10-05 23:57:42.029  13412-13412/ru.noties.debug.sample I/MainActivity.java﹕ someMethod() : 36 : x: 1, x2: 5, y: Hello!
+```
 
+```
+10-05 23:57:42.029  13412-13412/ru.noties.debug.sample W/MainActivity.java﹕ simpleMethod() : 48 :
+```
+
+```
+10-05 23:57:42.029  13412-13412/ru.noties.debug.sample E/MainActivity.java﹕ onCreate() : 30 : ok
+```
+
+* Simple exception handling
+
+```java
+try {
+    new AssertionError("This is exception");
+} catch (Throwable throwable) {
+     Debug.e(e);
+}
+```
+
+Output:
+
+```
 10-05 23:57:42.029  13412-13412/ru.noties.debug.sample E/MainActivity.java﹕ someMethodWithException() : 43 : Exception: java.lang.AssertionError: This is exception
     java.lang.AssertionError: This is exception
             at ru.noties.debug.sample.MainActivity.someMethodWithException(MainActivity.java:41)
@@ -33,11 +126,13 @@
             at java.lang.reflect.Method.invoke(Native Method)
             at com.android.internal.os.ZygoteInit$MethodAndArgsCaller.run(ZygoteInit.java:785)
             at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:601)
+```
 
-10-05 23:57:42.029  13412-13412/ru.noties.debug.sample W/MainActivity.java﹕ simpleMethod() : 48 :
+* Timer with millis & nanos
+*see sample application for code*
 
-10-05 23:57:42.029  13412-13412/ru.noties.debug.sample E/MainActivity.java﹕ onCreate() : 30 : ok
-
+Output millis:
+```
 10-05 23:57:42.919  13412-13436/ru.noties.debug.sample I/MainActivity.java﹕ run() : 83 : timer
     Timer #1
     start, 0 ms, here we go, someVar: 10
@@ -65,31 +160,4 @@
     + 37 ms, message, i: 21
     stop, 22 ms,
     took: 887 ms
-
-10-05 23:57:42.979  13412-13437/ru.noties.debug.sample I/MainActivity.java﹕ run() : 83 : timer
-    Timer Nano #2
-    start, 0 ns, here we go, someVar: 10
-    + 7448 ns,
-    + 17219166 ns, message, i: 1
-    + 39108541 ns,
-    + 92110468 ns, message, i: 3
-    + 88117605 ns,
-    + 38111614 ns, message, i: 5
-    + 5261 ns,
-    + 13100416 ns, message, i: 7
-    + 3098907 ns,
-    + 10098437 ns, message, i: 9
-    + 93844479 ns,
-    + 82182500 ns, message, i: 11
-    + 49115573 ns,
-    + 68115729 ns, message, i: 13
-    + 96099271 ns,
-    + 15099688 ns, message, i: 15
-    + 36090521 ns,
-    + 45093385 ns, message, i: 17
-    + 2090677 ns,
-    + 20088437 ns, message, i: 19
-    + 74090159 ns,
-    + 3088073 ns, message, i: 21
-    stop, 53095566 ns,
-    took: 939071921 ns.599  12379-12379/ru.noties.debug.sample W/MainActivity.java﹕ simpleMethod() : 38 :
+```
