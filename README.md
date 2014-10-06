@@ -8,7 +8,7 @@
 Debug library provides a lot of useful information. For ex., Java file name as tag,
 method name and a line number where Debug function was called.
 
-Also, it wraps String.format(), so you can create any message with nearly any quantity of variables to check at almost to pain (and time).
+Also, it wraps String.format(), so you can create any message with nearly any quantity of variables to check at almost no pain (and time).
 
 ### How to do it
 
