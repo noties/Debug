@@ -26,7 +26,7 @@ Maven:
 <dependency>
   <groupId>ru.noties.debug</groupId>
   <artifactId>debug</artifactId>
-  <version>1.1.0-SNAPSHOT</version>
+  <version>1.1.0</version>
   <type>aar</type>
 </dependency>
 ```
