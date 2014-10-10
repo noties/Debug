@@ -1,5 +1,7 @@
 ## Debug - Android logging tool
 
+[![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Debug-brightgreen.svg?style=flat)](https://android-arsenal.com/details/1/1038)
+
 ### Why?
 * Lightweight
 * Simple
