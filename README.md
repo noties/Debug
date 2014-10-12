@@ -164,3 +164,41 @@ Output millis:
     stop, 22 ms,
     took: 887 ms
 ```
+
+
+### What's next?
+
+If you are using Intellij Idea or Android Studio, you can make debugging even simpler.
+I wrote some Live Templates for this lib.
+Download *ru.noties.debug.live_templates.jar* and import it in your IDE. After that you could do something like that:
+
+```
+    di
+    de
+    dw
+    dd
+    dv
+```
+
+and hit tab (once at a time of cause), you will get:
+
+```java
+    Debug.i("", );
+    Debug.e("", );
+    Debug.w("", );
+    Debug.d("", );
+    Debug.v("", );
+```
+
+
+also, there are **dii**, **dee**, **dww**, **ddd** and **dvv**. After typing them you will get:
+
+```java
+    Debug.e("view: %s, firstVisibleItem: %s, visibleItemCount: %s, totalItemCount: %s", view, firstVisibleItem, visibleItemCount, totalItemCount);
+    Debug.i("view: %s, firstVisibleItem: %s, visibleItemCount: %s, totalItemCount: %s", view, firstVisibleItem, visibleItemCount, totalItemCount);
+    Debug.v("view: %s, firstVisibleItem: %s, visibleItemCount: %s, totalItemCount: %s", view, firstVisibleItem, visibleItemCount, totalItemCount);
+    Debug.d("view: %s, firstVisibleItem: %s, visibleItemCount: %s, totalItemCount: %s", view, firstVisibleItem, visibleItemCount, totalItemCount);
+    Debug.w("view: %s, firstVisibleItem: %s, visibleItemCount: %s, totalItemCount: %s", view, firstVisibleItem, visibleItemCount, totalItemCount);
+```
+
+for a OnScrollListener.onScroll() method. Yes, the pattern will be created from method's parameters and you will not have to write it yourself.
