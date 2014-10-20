@@ -35,7 +35,7 @@ Maven:
 
 Gradle:
 ```
-compile 'ru.noties.debug:1.1.0'
+compile 'ru.noties:debug:1.1.0'
 ```
 
 The best place to initialise Debug library is an Application's onCreate() method.
