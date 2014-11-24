@@ -2,11 +2,13 @@ package ru.noties.debug;
 
 import android.util.Log;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 public class Debug {
 
     private static final String THIS_FILE_NAME = "Debug.java";
     private static final String STARTING_MESSAGE_PATTERN = "%1$s() : %2$d : ";
-    private static final String TRACE_PATTERN = "%1$s : %2$s() : %3$d";
     private static final String TRACE_FIRST_LINE = "trace:";
     private static final String EXCEPTION_PATTERN = "Exception: %1$s";
 
@@ -36,14 +38,21 @@ public class Debug {
 
         if (!isDebug) return;
 
-        StackTraceElement[] elements = new Throwable().getStackTrace();
+        final Throwable throwable = new Throwable();
+
+        final StringWriter stringWriter = new StringWriter();
+        final PrintWriter printWriter = new PrintWriter(stringWriter);
+        throwable.printStackTrace(printWriter);
+
+        final String result = stringWriter.toString();
+        printWriter.close();
+
+        final StringBuilder builder = new StringBuilder(TRACE_FIRST_LINE);
+
+        StackTraceElement[] elements = throwable.getStackTrace();
 
         String fileName;
         String callerTag = null;
-        String methodName;
-        int lineNumber;
-
-        StringBuilder builder = new StringBuilder(TRACE_FIRST_LINE);
 
         for (StackTraceElement element: elements) {
 
@@ -53,17 +62,12 @@ public class Debug {
                 continue;
             }
 
-            if (callerTag == null) {
-                callerTag = fileName;
-            }
-
-            methodName = element.getMethodName();
-            lineNumber = element.getLineNumber();
-
-            builder
-                    .append("\n")
-                    .append(String.format(TRACE_PATTERN, fileName, methodName, lineNumber));
+            callerTag = fileName;
+            break;
         }
+
+        builder.append("\n")
+                .append(result);
 
         log(new Message(level, null, callerTag, builder.toString()));
     }
