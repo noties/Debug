@@ -175,9 +175,7 @@ Output millis:
 ```
 
 
-@Deprecated
-/* Do not use this, as long as you can lose your own live templates */
-### What's next?
+### ~~What's next?~~ @Deprecated - Do not use this, as long as you can lose your own live templates
 
 If you are using Intellij Idea or Android Studio, you can make debugging even simpler.
 I wrote some Live Templates for this lib.
