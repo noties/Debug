@@ -12,6 +12,10 @@ method name and a line number where Debug function was called.
 
 Also, it wraps String.format(), so you can create any message with nearly any quantity of variables to check at almost no pain (and time).
 
+### What's new (1.1.2)
+* Methods in logcat are now clickable
+* Small change to trace pattern to exclude Debug.java
+
 ### How to do it
 
 ```java
@@ -62,41 +66,45 @@ Debug.trace();
 
 Output:
 ```
-10-05 23:57:42.029  13412-13412/ru.noties.debug.sample V/MainActivity.java﹕ trace:
-    MainActivity.java : onCreate() : 20
-    Activity.java : performCreate() : 5231
-    Instrumentation.java : callActivityOnCreate() : 1087
-    ActivityThread.java : performLaunchActivity() : 2148
-    ActivityThread.java : handleLaunchActivity() : 2233
-    ActivityThread.java : access$800() : 135
-    ActivityThread.java : handleMessage() : 1196
-    Handler.java : dispatchMessage() : 102
-    Looper.java : loop() : 136
-    ActivityThread.java : main() : 5001
-    Method.java : invoke() : -2
-    ZygoteInit.java : run() : 785
-    ZygoteInit.java : main() : 601
+03-23 23:48:59.988  10335-10335/ru.noties.debug.sample V/MainActivity.java﹕ trace:
+            at ru.noties.debug.sample.MainActivity.onCreate(MainActivity.java:20)
+            at android.app.Activity.performCreate(Activity.java:5990)
+            at android.app.Instrumentation.callActivityOnCreate(Instrumentation.java:1106)
+            at android.app.ActivityThread.performLaunchActivity(ActivityThread.java:2278)
+            at android.app.ActivityThread.handleLaunchActivity(ActivityThread.java:2387)
+            at android.app.ActivityThread.access$800(ActivityThread.java:151)
+            at android.app.ActivityThread$H.handleMessage(ActivityThread.java:1303)
+            at android.os.Handler.dispatchMessage(Handler.java:102)
+            at android.os.Looper.loop(Looper.java:135)
+            at android.app.ActivityThread.main(ActivityThread.java:5254)
+            at java.lang.reflect.Method.invoke(Method.java:-2)
+            at java.lang.reflect.Method.invoke(Method.java:372)
+            at com.android.internal.os.ZygoteInit$MethodAndArgsCaller.run(ZygoteInit.java:903)
+            at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:698)
 ```
 
 * All Android Log levels
 
 ```java
-Debug.i("x: %d, x2: %d, y: %s", x, x2, y);
+Debug.v();
+Debug.d();
+Debug.i();
 Debug.w();
-Debug.e("ok");
+Debug.e();
+Debug.wtf();
 ```
 
 Output:
 ```
-10-05 23:57:42.029  13412-13412/ru.noties.debug.sample I/MainActivity.java﹕ someMethod() : 36 : x: 1, x2: 5, y: Hello!
+03-23 23:48:59.988  10335-10335/ru.noties.debug.sample I/MainActivity.java﹕ someMethod(MainActivity.java:36) : x: 1, x2: 5, y: Hello!
 ```
 
 ```
-10-05 23:57:42.029  13412-13412/ru.noties.debug.sample W/MainActivity.java﹕ simpleMethod() : 48 :
+03-23 23:48:59.990  10335-10335/ru.noties.debug.sample W/MainActivity.java﹕ simpleMethod(MainActivity.java:48) :
 ```
 
 ```
-10-05 23:57:42.029  13412-13412/ru.noties.debug.sample E/MainActivity.java﹕ onCreate() : 30 : ok
+03-23 23:48:59.991  10335-10335/ru.noties.debug.sample E/MainActivity.java﹕ onCreate(MainActivity.java:30) : ok
 ```
 
 * Simple exception handling
@@ -112,22 +120,23 @@ try {
 Output:
 
 ```
-10-05 23:57:42.029  13412-13412/ru.noties.debug.sample E/MainActivity.java﹕ someMethodWithException() : 43 : Exception: java.lang.AssertionError: This is exception
+03-23 23:48:59.989  10335-10335/ru.noties.debug.sample E/MainActivity.java﹕ someMethodWithException(MainActivity.java:43) : Exception: java.lang.AssertionError: This is exception
     java.lang.AssertionError: This is exception
             at ru.noties.debug.sample.MainActivity.someMethodWithException(MainActivity.java:41)
             at ru.noties.debug.sample.MainActivity.onCreate(MainActivity.java:24)
-            at android.app.Activity.performCreate(Activity.java:5231)
-            at android.app.Instrumentation.callActivityOnCreate(Instrumentation.java:1087)
-            at android.app.ActivityThread.performLaunchActivity(ActivityThread.java:2148)
-            at android.app.ActivityThread.handleLaunchActivity(ActivityThread.java:2233)
-            at android.app.ActivityThread.access$800(ActivityThread.java:135)
-            at android.app.ActivityThread$H.handleMessage(ActivityThread.java:1196)
+            at android.app.Activity.performCreate(Activity.java:5990)
+            at android.app.Instrumentation.callActivityOnCreate(Instrumentation.java:1106)
+            at android.app.ActivityThread.performLaunchActivity(ActivityThread.java:2278)
+            at android.app.ActivityThread.handleLaunchActivity(ActivityThread.java:2387)
+            at android.app.ActivityThread.access$800(ActivityThread.java:151)
+            at android.app.ActivityThread$H.handleMessage(ActivityThread.java:1303)
             at android.os.Handler.dispatchMessage(Handler.java:102)
-            at android.os.Looper.loop(Looper.java:136)
-            at android.app.ActivityThread.main(ActivityThread.java:5001)
+            at android.os.Looper.loop(Looper.java:135)
+            at android.app.ActivityThread.main(ActivityThread.java:5254)
             at java.lang.reflect.Method.invoke(Native Method)
-            at com.android.internal.os.ZygoteInit$MethodAndArgsCaller.run(ZygoteInit.java:785)
-            at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:601)
+            at java.lang.reflect.Method.invoke(Method.java:372)
+            at com.android.internal.os.ZygoteInit$MethodAndArgsCaller.run(ZygoteInit.java:903)
+            at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:698)
 ```
 
 * Timer with millis & nanos
@@ -166,6 +175,8 @@ Output millis:
 ```
 
 
+@Deprecated
+/* Do not use this, as long as you can lose your own live templates */
 ### What's next?
 
 If you are using Intellij Idea or Android Studio, you can make debugging even simpler.

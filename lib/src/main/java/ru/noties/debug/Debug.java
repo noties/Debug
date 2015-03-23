@@ -2,15 +2,13 @@ package ru.noties.debug;
 
 import android.util.Log;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-
 public class Debug {
 
     private static final String THIS_FILE_NAME = "Debug.java";
-    private static final String STARTING_MESSAGE_PATTERN = "%1$s() : %2$d : ";
+    private static final String STARTING_MESSAGE_PATTERN_LINK = "%1$s(%2$s:%3$d) : ";
     private static final String TRACE_FIRST_LINE = "trace:";
     private static final String EXCEPTION_PATTERN = "Exception: %1$s";
+    private static final String TRACE_PATTERN = "at %1$s.%2$s(%3$s:%4$d)";
 
     private static boolean isDebug;
 
@@ -31,28 +29,30 @@ public class Debug {
     }
 
     public static void trace() {
-        trace(Level.V);
+        trace(Level.V, -1);
     }
 
     public static void trace(Level level) {
+        trace(level, -1);
+    }
+
+    public static void trace(int maxItems) {
+        trace(Level.V, maxItems);
+    }
+
+    public static void trace(Level level, int maxItems) {
 
         if (!isDebug) return;
 
         final Throwable throwable = new Throwable();
-
-        final StringWriter stringWriter = new StringWriter();
-        final PrintWriter printWriter = new PrintWriter(stringWriter);
-        throwable.printStackTrace(printWriter);
-
-        final String result = stringWriter.toString();
-        printWriter.close();
-
         final StringBuilder builder = new StringBuilder(TRACE_FIRST_LINE);
 
-        StackTraceElement[] elements = throwable.getStackTrace();
+        final StackTraceElement[] elements = throwable.getStackTrace();
 
         String fileName;
         String callerTag = null;
+
+        int items = 0;
 
         for (StackTraceElement element: elements) {
 
@@ -62,12 +62,25 @@ public class Debug {
                 continue;
             }
 
-            callerTag = fileName;
-            break;
-        }
+            if (callerTag == null) {
+                callerTag = fileName;
+            }
 
-        builder.append("\n")
-                .append(result);
+            if (maxItems > 0 && ++items > maxItems) {
+                continue;
+            }
+
+            builder.append('\n')
+                    .append(
+                            String.format(
+                                    TRACE_PATTERN,
+                                    element.getClassName(),
+                                    element.getMethodName(),
+                                    fileName,
+                                    element.getLineNumber()
+                            )
+                    );
+        }
 
         log(new Message(level, null, callerTag, builder.toString()));
     }
@@ -137,6 +150,18 @@ public class Debug {
         v(null);
     }
 
+    public static void wtf() {
+        log(Level.WTF, null, null);
+    }
+
+    public static void wtf(String message, Object... args) {
+        log(Level.WTF, null, message, args);
+    }
+
+    public static void wtf(Throwable throwable, String message, Object... args) {
+        log(Level.WTF, throwable, message, args);
+    }
+
     static String getLogMessage(String message, Object... args) {
         if (message == null) {
             return "";
@@ -170,7 +195,7 @@ public class Debug {
             methodName = element.getMethodName();
 
             final String startingMessage
-                    = String.format(STARTING_MESSAGE_PATTERN, methodName, lineNumber);
+                    = String.format(STARTING_MESSAGE_PATTERN_LINK, methodName, fileName,  lineNumber);
             final String logMessage = getLogMessage(message, args);
 
             return new Holder(fileName, startingMessage + logMessage);

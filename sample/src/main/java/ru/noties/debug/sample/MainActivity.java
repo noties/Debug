@@ -17,7 +17,7 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
 
         // Trace current method calls chain
-        Debug.trace();
+        Debug.trace(100);
 
         someMethod(1, 5, "Hello!");
 

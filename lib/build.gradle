@@ -8,21 +8,14 @@ repositories {
 }
 
 android {
-    compileSdkVersion 21
-    buildToolsVersion "21.1.1"
+    compileSdkVersion 22
+    buildToolsVersion "22"
 
     defaultConfig {
-        applicationId "ru.noties.debug"
         minSdkVersion 8
-        targetSdkVersion 21
-        versionCode 3
-        versionName "1.1.1"
-    }
-
-    buildTypes {
-        release {
-
-        }
+        targetSdkVersion 22
+        versionCode 4
+        versionName "1.1.2"
     }
 
     sourceSets {
