@@ -27,19 +27,10 @@ Debug.e(new Throwable());
 ```
 
 ### Installation
-Maven:
-```
-<dependency>
-  <groupId>ru.noties</groupId>
-  <artifactId>debug</artifactId>
-  <version>1.1.1</version>
-  <type>aar</type>
-</dependency>
-```
 
 Gradle:
-```
-compile 'ru.noties:debug:1.1.1'
+```groovy
+compile 'ru.noties:debug:1.1.2'
 ```
 
 The best place to initialise Debug library is an Application's onCreate() method.
