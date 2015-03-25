@@ -7,10 +7,24 @@
 * Simple
 * Powerful
 
-Debug library provides a lot of useful information. For ex., Java file name as tag,
-method name and a line number where Debug function was called.
 
-Also, it wraps String.format(), so you can create any message with nearly any quantity of variables to check at almost no pain (and time).
+Debug library provides a lot of useful information. For ex., Java file name as a tag,
+method name and a line number where Debug function was called.
+Library provides the ability to jump to the source right from the logcat output.
+
+
+It has no impact on release code - no additional information will be collected at runtime (aka stacktrace).
+The only thing is no do is to send a bool to the Debug.init() method. If you are using 
+Gradle - it just simplifies the initialization to a line of code:
+```java
+Debug.init(BuildConfig.DEBUG);
+```
+Well, if you are not using Gradle, where surely **must** be a way...
+
+
+Also, it wraps String.format(), so you can create any message with nearly any 
+quantity of variables to check at almost no pain (and time).
+
 
 ### What's new (1.1.2)
 * Methods in logcat are now clickable
