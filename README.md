@@ -28,6 +28,11 @@ Also, it wraps String.format(), so you can create any message with nearly any
 quantity of variables to check at almost no pain (and time).
 
 
+### What's new (1.1.3
+* Decreased number of method calls inside Debug.java
+* Empty Timer implementation if !isDebug
+
+
 ### What's new (1.1.2)
 * Methods in logcat are now clickable
 * Small change to trace pattern to exclude Debug.java
