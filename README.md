@@ -21,6 +21,8 @@ Debug.init(BuildConfig.DEBUG);
 ```
 Well, if you are not using Gradle, where surely **must** be a way...
 
+Note that if you are using this library in multi-process application, you must call `Debug.init(boolean)` for every process.
+
 
 Also, it wraps String.format(), so you can create any message with nearly any 
 quantity of variables to check at almost no pain (and time).
