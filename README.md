@@ -1,6 +1,6 @@
 ## Debug - Android logging tool
 
-[![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Debug-brightgreen.svg?style=flat)](https://android-arsenal.com/details/1/1038) [![Maven Central](https://img.shields.io/maven-central/v/ru.noties/debug.svg)](http://search.maven.org/#search|ga|1|g%3A%22ru.noties%22%20AND%20a%3A%22debug%22)
+[![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Debug-brightgreen.svg?style=flat)](https://android-arsenal.com/details/1/1038)
 
 ### Why?
 * Lightweight
@@ -42,9 +42,11 @@ Debug.e(new Throwable());
 
 ### Installation
 
+[![Maven Central](https://img.shields.io/maven-central/v/ru.noties/debug.svg)](http://search.maven.org/#search|ga|1|g%3A%22ru.noties%22%20AND%20a%3A%22debug%22)
+
 Gradle:
 ```groovy
-compile 'ru.noties:debug:1.1.2'
+compile 'ru.noties:debug:x.x.x'
 ```
 
 The best place to initialise Debug library is an Application's onCreate() method.
