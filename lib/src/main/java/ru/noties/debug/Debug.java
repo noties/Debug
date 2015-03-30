@@ -21,10 +21,16 @@ public class Debug {
     }
 
     public static Timer newTimer(String name, TimerType type) {
+        if (!isDebug) {
+            return new EmptyTimer();
+        }
         return SimpleTimer.newInstance(name, type);
     }
 
     public static Timer newTimer(String name) {
+        if (!isDebug) {
+            return new EmptyTimer();
+        }
         return SimpleTimer.newInstance(name);
     }
 
