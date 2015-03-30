@@ -90,16 +90,15 @@ public class Debug {
     }
 
     public static void e(String message,  Object... args) {
-        e(null, message, args);
+        log(Level.E, null, message, args);
     }
 
     public static void e() {
-        e(null);
+        log(Level.E, null, null);
     }
 
     public static void e(Throwable throwable) {
-        if (!isDebug) return;
-        e(throwable, EXCEPTION_PATTERN, throwable);
+        log(Level.E, throwable, EXCEPTION_PATTERN, throwable);
     }
 
     public static void w(Throwable throwable, String message, Object... args) {
@@ -107,11 +106,11 @@ public class Debug {
     }
 
     public static void w(String message, Object... args) {
-        w(null, message, args);
+        log(Level.W, null, message, args);
     }
 
     public static void w() {
-        w(null);
+        log(Level.W, null, null);
     }
 
     public static void i(Throwable throwable, String message, Object... args) {
@@ -119,11 +118,11 @@ public class Debug {
     }
 
     public static void i(String message, Object... args) {
-        i(null, message, args);
+        log(Level.I, null, message, args);
     }
 
     public static void i() {
-        i(null);
+        log(Level.I, null, null);
     }
 
     public static void d(Throwable throwable, String message, Object... args) {
@@ -131,11 +130,11 @@ public class Debug {
     }
 
     public static void d(String message, Object... args) {
-        d(null, message, args);
+        log(Level.D, null, message, args);
     }
 
     public static void d() {
-        d(null);
+        log(Level.D, null, null);
     }
 
     public static void v(Throwable throwable, String message, Object... args) {
@@ -143,11 +142,11 @@ public class Debug {
     }
 
     public static void v(String message, Object... args) {
-        v(null, message, args);
+        log(Level.V, null, message, args);
     }
 
     public static void v() {
-        v(null);
+        log(Level.V, null, null);
     }
 
     public static void wtf() {
