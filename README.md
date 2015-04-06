@@ -79,23 +79,8 @@ Debug.trace();
 ```
 
 Output:
-```
-03-23 23:48:59.988  10335-10335/ru.noties.debug.sample V/MainActivity.java﹕ trace:
-            at ru.noties.debug.sample.MainActivity.onCreate(MainActivity.java:20)
-            at android.app.Activity.performCreate(Activity.java:5990)
-            at android.app.Instrumentation.callActivityOnCreate(Instrumentation.java:1106)
-            at android.app.ActivityThread.performLaunchActivity(ActivityThread.java:2278)
-            at android.app.ActivityThread.handleLaunchActivity(ActivityThread.java:2387)
-            at android.app.ActivityThread.access$800(ActivityThread.java:151)
-            at android.app.ActivityThread$H.handleMessage(ActivityThread.java:1303)
-            at android.os.Handler.dispatchMessage(Handler.java:102)
-            at android.os.Looper.loop(Looper.java:135)
-            at android.app.ActivityThread.main(ActivityThread.java:5254)
-            at java.lang.reflect.Method.invoke(Method.java:-2)
-            at java.lang.reflect.Method.invoke(Method.java:372)
-            at com.android.internal.os.ZygoteInit$MethodAndArgsCaller.run(ZygoteInit.java:903)
-            at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:698)
-```
+![trace](https://raw.githubusercontent.com/noties/Debug/master/pics/trace.png)
+
 
 * All Android Log levels
 
@@ -109,17 +94,12 @@ Debug.wtf();
 ```
 
 Output:
-```
-03-23 23:48:59.988  10335-10335/ru.noties.debug.sample I/MainActivity.java﹕ someMethod(MainActivity.java:36) : x: 1, x2: 5, y: Hello!
-```
+![someMethod](https://raw.githubusercontent.com/noties/Debug/master/pics/someMethod.png)
 
-```
-03-23 23:48:59.990  10335-10335/ru.noties.debug.sample W/MainActivity.java﹕ simpleMethod(MainActivity.java:48) :
-```
+![simpleMethod](https://raw.githubusercontent.com/noties/Debug/master/pics/simpleMethod.png)
 
-```
-03-23 23:48:59.991  10335-10335/ru.noties.debug.sample E/MainActivity.java﹕ onCreate(MainActivity.java:30) : ok
-```
+![onCreate](https://raw.githubusercontent.com/noties/Debug/master/pics/onCreate.png)
+
 
 * Simple exception handling
 
@@ -132,61 +112,15 @@ try {
 ```
 
 Output:
+![someMethodWithException](https://raw.githubusercontent.com/noties/Debug/master/pics/someMethodWithException.png)
 
-```
-03-23 23:48:59.989  10335-10335/ru.noties.debug.sample E/MainActivity.java﹕ someMethodWithException(MainActivity.java:43) : Exception: java.lang.AssertionError: This is exception
-    java.lang.AssertionError: This is exception
-            at ru.noties.debug.sample.MainActivity.someMethodWithException(MainActivity.java:41)
-            at ru.noties.debug.sample.MainActivity.onCreate(MainActivity.java:24)
-            at android.app.Activity.performCreate(Activity.java:5990)
-            at android.app.Instrumentation.callActivityOnCreate(Instrumentation.java:1106)
-            at android.app.ActivityThread.performLaunchActivity(ActivityThread.java:2278)
-            at android.app.ActivityThread.handleLaunchActivity(ActivityThread.java:2387)
-            at android.app.ActivityThread.access$800(ActivityThread.java:151)
-            at android.app.ActivityThread$H.handleMessage(ActivityThread.java:1303)
-            at android.os.Handler.dispatchMessage(Handler.java:102)
-            at android.os.Looper.loop(Looper.java:135)
-            at android.app.ActivityThread.main(ActivityThread.java:5254)
-            at java.lang.reflect.Method.invoke(Native Method)
-            at java.lang.reflect.Method.invoke(Method.java:372)
-            at com.android.internal.os.ZygoteInit$MethodAndArgsCaller.run(ZygoteInit.java:903)
-            at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:698)
-```
 
 * Timer with millis & nanos
 
 *see sample application for code*
 
 Output millis:
-```
-10-05 23:57:42.919  13412-13436/ru.noties.debug.sample I/MainActivity.java﹕ run() : 83 : timer
-    Timer #1
-    start, 0 ms, here we go, someVar: 10
-    + 0 ms,
-    + 65 ms, message, i: 1
-    + 5 ms,
-    + 51 ms, message, i: 3
-    + 3 ms,
-    + 18 ms, message, i: 5
-    + 95 ms,
-    + 23 ms, message, i: 7
-    + 63 ms,
-    + 74 ms, message, i: 9
-    + 14 ms,
-    + 38 ms, message, i: 11
-    + 33 ms,
-    + 92 ms, message, i: 13
-    + 28 ms,
-    + 17 ms, message, i: 15
-    + 31 ms,
-    + 60 ms, message, i: 17
-    + 71 ms,
-    + 40 ms, message, i: 19
-    + 7 ms,
-    + 37 ms, message, i: 21
-    stop, 22 ms,
-    took: 887 ms
-```
+![timer](https://raw.githubusercontent.com/noties/Debug/master/pics/timer.png)
 
 
 ### ~~What's next?~~ @Deprecated - Do not use this, as long as you can lose your own live templates
