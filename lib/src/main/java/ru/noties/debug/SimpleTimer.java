@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by dimaster on 05.10.14.
+ * Created by Dimitry Ivanov (mail@dimitryivanov.ru) on 05.10.14.
  */
 class SimpleTimer implements Timer {
 
