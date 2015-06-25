@@ -1,34 +1,60 @@
 package ru.noties.debug;
 
-import android.util.Log;
+import ru.noties.debug.out.AndroidLogDebugOutput;
+import ru.noties.debug.out.DebugOutput;
 
 public class Debug {
+
+    private static volatile Debug sInstance = null;
+
+    private static Debug getInstance() {
+        Debug local = sInstance;
+        if (local == null) {
+            synchronized (Debug.class) {
+                local = sInstance;
+                if (local == null) {
+                    local = sInstance = new Debug();
+                }
+            }
+        }
+        return local;
+    }
 
     private static final String THIS_FILE_NAME = "Debug.java";
     private static final String STARTING_MESSAGE_PATTERN_LINK = "%1$s(%2$s:%3$d) : ";
     private static final String TRACE_FIRST_LINE = "trace:";
-    private static final String EXCEPTION_PATTERN = "Exception: %1$s";
-    private static final String TRACE_PATTERN = "at %1$s.%2$s(%3$s:%4$d)";
 
-    private static boolean isDebug;
+    private DebugOutput output;
+    
+    private Debug() {}
 
-    private Debug() {
-
+    @Deprecated
+    public static void init(final boolean isDebug) {
+        Debug.getInstance().setOutput(new AndroidLogDebugOutput(isDebug));
+    }
+    
+    public static void init(DebugOutput debugOutput) {
+        Debug.getInstance().setOutput(debugOutput);
     }
 
-    public static void init(final boolean debug) {
-        isDebug = debug;
+    public void setOutput(DebugOutput output) {
+        this.output = output;
+    }
+    
+    public static boolean isDebug() {
+        final DebugOutput output = Debug.getInstance().output;
+        return output != null && output.isDebug();
     }
 
     public static Timer newTimer(String name, TimerType type) {
-        if (!isDebug) {
+        if (!isDebug()) {
             return new EmptyTimer();
         }
         return SimpleTimer.newInstance(name, type);
     }
 
     public static Timer newTimer(String name) {
-        if (!isDebug) {
+        if (!isDebug()) {
             return new EmptyTimer();
         }
         return SimpleTimer.newInstance(name);
@@ -48,7 +74,7 @@ public class Debug {
 
     public static void trace(Level level, int maxItems) {
 
-        if (!isDebug) return;
+        if (!isDebug()) return;
 
         final Throwable throwable = new Throwable();
         final StringBuilder builder = new StringBuilder(TRACE_FIRST_LINE);
@@ -73,22 +99,16 @@ public class Debug {
             }
 
             if (maxItems > 0 && ++items > maxItems) {
-                continue;
+                break;
             }
 
             builder.append('\n')
-                    .append(
-                            String.format(
-                                    TRACE_PATTERN,
-                                    element.getClassName(),
-                                    element.getMethodName(),
-                                    fileName,
-                                    element.getLineNumber()
-                            )
-                    );
+                    .append("\tat ")
+                    .append(element.toString())
+                    .append('\n');
         }
 
-        log(new Message(level, null, callerTag, builder.toString()));
+        logTrace(level, new Holder(callerTag, builder.toString()));
     }
 
     public static void e(Throwable throwable, String message, Object... args) {
@@ -104,7 +124,7 @@ public class Debug {
     }
 
     public static void e(Throwable throwable) {
-        log(Level.E, throwable, EXCEPTION_PATTERN, throwable);
+        log(Level.E, throwable, "\n");
     }
 
     public static void w(Throwable throwable, String message, Object... args) {
@@ -209,21 +229,6 @@ public class Debug {
         return null;
     }
 
-    private static Message getMessage(
-            final Level level,
-            final Throwable throwable,
-            final String message,
-            final Object... args
-    ) {
-
-        final Holder holder = getHolder(message, args);
-        if (holder == null) {
-            return null;
-        }
-
-        return new Message(level, throwable, holder.getTag(), holder.getMessage());
-    }
-
     private static void log(
             final Level level,
             final Throwable throwable,
@@ -231,64 +236,41 @@ public class Debug {
             final Object... args
     ) {
 
-        if (!isDebug) {
+        final Debug debug = Debug.getInstance();
+        final DebugOutput output = debug.output;
+        if (output == null
+                || !output.isDebug()) {
             return;
         }
 
-        final Message m = getMessage(level, throwable, message, args);
-
-        log(m);
+        final Holder holder = getHolder(message, args);
+        if (holder != null) {
+            output.log(level, throwable, holder.tag, holder.message);
+        }
     }
 
-    private static void log(Message message) {
-
-        if (message == null) {
+    private static void logTrace(
+            Level level,
+            Holder holder
+    ) {
+        final Debug debug = Debug.getInstance();
+        final DebugOutput output = debug.output;
+        if (output == null
+                || !output.isDebug()) {
             return;
         }
 
-        switch (message.getLevel()) {
-
-            case E:
-                Log.e(message.getTag(), message.getMessage(), message.getThrowable());
-                break;
-
-            case W:
-                Log.w(message.getTag(), message.getMessage(), message.getThrowable());
-                break;
-
-            case I:
-                Log.i(message.getTag(), message.getMessage(), message.getThrowable());
-                break;
-
-            case D:
-                Log.d(message.getTag(), message.getMessage(), message.getThrowable());
-                break;
-
-            case V:
-                Log.v(message.getTag(), message.getMessage(), message.getThrowable());
-                break;
-
-            default:
-                Log.wtf(message.getTag(), message.getMessage(), message.getThrowable());
-        }
+        output.log(level, null, holder.tag, holder.message);
     }
 
     private static class Holder {
 
-        private final String tag;
-        private final String message;
+        final String tag;
+        final String message;
 
-        private Holder(String tag, String message) {
+        Holder(String tag, String message) {
             this.tag     = tag;
             this.message = message;
-        }
-
-        public String getTag() {
-            return tag;
-        }
-
-        public String getMessage() {
-            return message;
         }
     }
 }
