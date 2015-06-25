@@ -21,8 +21,8 @@ public class Debug {
     }
 
     private static final String THIS_FILE_NAME = "Debug.java";
-    private static final String STARTING_MESSAGE_PATTERN_LINK = "%1$s(%2$s:%3$d) : ";
-    private static final String TRACE_FIRST_LINE = "trace:";
+    private static final String STARTING_MESSAGE_PATTERN_LINK = "%1$s(%2$s:%3$d)";
+    private static final String TRACE_FIRST_LINE = "trace:\n";
 
     private DebugOutput output;
     
@@ -102,8 +102,7 @@ public class Debug {
                 break;
             }
 
-            builder.append('\n')
-                    .append("\tat ")
+            builder.append("\tat ")
                     .append(element.toString())
                     .append('\n');
         }
@@ -124,7 +123,7 @@ public class Debug {
     }
 
     public static void e(Throwable throwable) {
-        log(Level.E, throwable, "\n");
+        log(Level.E, throwable, null);
     }
 
     public static void w(Throwable throwable, String message, Object... args) {
@@ -189,7 +188,7 @@ public class Debug {
 
     static String getLogMessage(String message, Object... args) {
         if (message == null) {
-            return "";
+            return null;
         }
 
         if (args == null || args.length == 0) {
@@ -222,8 +221,14 @@ public class Debug {
             final String startingMessage
                     = String.format(STARTING_MESSAGE_PATTERN_LINK, methodName, fileName,  lineNumber);
             final String logMessage = getLogMessage(message, args);
+            final String out;
+            if (logMessage != null) {
+                out = startingMessage + " : " + logMessage;
+            } else {
+                out = startingMessage;
+            }
 
-            return new Holder(fileName, startingMessage + logMessage);
+            return new Holder(fileName, out);
         }
 
         return null;

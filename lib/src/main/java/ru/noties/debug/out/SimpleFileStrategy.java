@@ -26,13 +26,24 @@ public class SimpleFileStrategy implements FileDebugOutput.FileStrategy {
             String logFolderName,
             LogFileNameStrategy logFileNameStrategy
     ) throws InitializationException {
-        final File cacheFolder = context.getCacheDir();
-        if (!cacheFolder.exists()) {
-            if (!cacheFolder.mkdirs()) {
-                throw new InitializationException("Could not obtain application's cache dir, path: " + cacheFolder.getAbsolutePath());
+        return SimpleFileStrategy.newInstance(
+                context.getCacheDir(),
+                logFolderName,
+                logFileNameStrategy
+        );
+    }
+
+    public static SimpleFileStrategy newInstance(
+            File folder,
+            String logFolderName,
+            LogFileNameStrategy logFileNameStrategy
+    ) throws InitializationException {
+        if (!folder.exists()) {
+            if (!folder.mkdirs()) {
+                throw new InitializationException("Could not obtain application's cache dir, path: " + folder.getAbsolutePath());
             }
         }
-        final File logsFolder = new File(cacheFolder, logFolderName);
+        final File logsFolder = new File(folder, logFolderName);
         if (!logsFolder.exists()) {
             if (!logsFolder.mkdirs()) {
                 throw new InitializationException("Could not obtain logs folder, path: " + logsFolder.getAbsolutePath());

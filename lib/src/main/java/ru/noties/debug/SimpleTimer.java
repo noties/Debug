@@ -89,20 +89,24 @@ class SimpleTimer implements Timer {
             return builder.toString();
         }
 
-        final long start = mList.get(0).getWhen();
+        final long start = mList.get(0).when;
         long last = start;
+        String msg;
 
         for (Holder holder: mList) {
 
             builder.append("\n")
-                    .append(holder.getType().getValue())
-                    .append(getWhenString(last, holder.getWhen()))
-                    .append(", ")
-                    .append(getMessage(holder.getMessage(), holder.getArgs()));
+                    .append(holder.type.value)
+                    .append(getWhenString(last, holder.when));
+            msg = getMessage(holder.message, holder.args);
+            if (msg != null) {
+                builder.append(", ")
+                        .append(msg);
+            }
 
-            last = holder.getWhen();
+            last = holder.when;
 
-            if (holder.getType() == Type.STOP) {
+            if (holder.type == Type.STOP) {
                 builder.append("\n")
                         .append(String.format(TOOK_PATTEN, getWhenString(start, last)));
             }
@@ -138,49 +142,29 @@ class SimpleTimer implements Timer {
 
     private static class Holder {
 
-        private final Type type;
-        private final long when;
-        private final String message;
-        private final Object[] args;
+        final Type type;
+        final long when;
+        final String message;
+        final Object[] args;
 
-        private Holder(Type type, long when, String message, Object[] args) {
+        Holder(Type type, long when, String message, Object[] args) {
             this.type       = type;
             this.when       = when;
             this.message    = message;
             this.args       = args;
         }
-
-        public Type getType() {
-            return type;
-        }
-
-        public long getWhen() {
-            return when;
-        }
-
-        public String getMessage() {
-            return message;
-        }
-
-        public Object[] getArgs() {
-            return args;
-        }
     }
 
-    private static enum Type {
+    private enum Type {
 
         TICK    ("\t+ "),
         START   ("start, "),
         STOP    ("stop, ");
 
-        private final String mValue;
+        final String value;
 
-        private Type(String value) {
-            this.mValue = value;
-        }
-
-        private String getValue() {
-            return mValue;
+        Type(String value) {
+            this.value = value;
         }
     }
 }

@@ -68,7 +68,7 @@ public class MainActivity extends Activity {
                     if ((i & 1) == 0) {
                         timer.tick();
                     } else {
-                        timer.tick("message, i: %d", i);
+                        timer.tick("i: %d", i);
                     }
 
                     // Dont do it. Ever

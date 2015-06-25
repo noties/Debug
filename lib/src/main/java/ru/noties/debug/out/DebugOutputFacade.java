@@ -1,5 +1,7 @@
 package ru.noties.debug.out;
 
+import java.util.Collection;
+
 import ru.noties.debug.Level;
 
 /**
@@ -7,9 +9,19 @@ import ru.noties.debug.Level;
  */
 public class DebugOutputFacade implements DebugOutput {
 
+    public static DebugOutputFacade newInstance(DebugOutput... outputs) {
+        return new DebugOutputFacade(outputs);
+    }
+
+    public static DebugOutputFacade newInstance(Collection<? extends DebugOutput> collection) {
+        final DebugOutput[] outputs = new DebugOutput[collection.size()];
+        collection.toArray(outputs);
+        return new DebugOutputFacade(outputs);
+    }
+
     private final DebugOutput[] outputs;
 
-    public DebugOutputFacade(DebugOutput... outputs) {
+    private DebugOutputFacade(DebugOutput[] outputs) {
         this.outputs = outputs;
     }
 
