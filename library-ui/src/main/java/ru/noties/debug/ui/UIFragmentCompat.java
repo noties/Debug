@@ -68,7 +68,7 @@ public class UIFragmentCompat extends Fragment implements LoaderManager.LoaderCa
     public void onStop() {
         super.onStop();
 
-        getUIView().setIterator(null);
+//        getUIView().setIterator(null);
         getLoaderManager().destroyLoader(0);
     }
 

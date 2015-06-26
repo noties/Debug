@@ -5,7 +5,9 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -41,13 +43,11 @@ public class FileDebugOutput implements DebugOutput {
         class DefaultOutputConverter implements OutputConverter {
 
             private static final String PATTERN = "%s  %s  %s/%s: %s";
+            private static final String DATE_PATTERN = "dd-MM HH:mm:ss.SSS";
 
             private final DateFormat dateFormat;
             {
-                dateFormat = DateFormat.getDateTimeInstance(
-                        DateFormat.SHORT,
-                        DateFormat.MEDIUM
-                );
+                dateFormat = new SimpleDateFormat(DATE_PATTERN, Locale.US);
             }
 
             @Override

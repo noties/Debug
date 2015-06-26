@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 
 import ru.noties.debug.ui.model.LogDatabase;
 import ru.noties.debug.ui.model.LogItem;
+import ru.noties.debug.ui.model.LogItemFilter;
 import ru.noties.debug.ui.model.LogLoader;
 import ru.noties.storm.StormIterator;
 
@@ -48,7 +49,17 @@ public class UIFragment extends Fragment implements LoaderManager.LoaderCallback
         if (fragmentView == null) {
             return null;
         }
-        return fragmentView.onCreateView(inflater, parent, sis);
+        final View view = fragmentView.onCreateView(inflater, parent, sis);
+        fragmentView.setOnFilterListener(new UIFragmentView.OnFilterListener() {
+            @Override
+            public void onFilterChange(LogItemFilter filter) {
+                final Loader<StormIterator<LogItem>> loader = getLoaderManager().getLoader(0);
+                if (loader != null) {
+                    ((LogLoader) loader).setLogFilter(filter);
+                }
+            }
+        });
+        return view;
     }
 
     @Override

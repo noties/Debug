@@ -96,6 +96,11 @@ public class AndroidUIDebugOutput implements DebugOutput, Application.ActivityLi
                 onButtonClick();
             }
         });
+
+        if (mButton.getParent() != null) {
+            ((ViewGroup) mButton.getParent()).removeView(mButton);
+        }
+
         content.addView(mButton);
     }
 
@@ -188,10 +193,6 @@ public class AndroidUIDebugOutput implements DebugOutput, Application.ActivityLi
             return false;
         }
         activity.getSupportFragmentManager().popBackStack();
-//        activity.getSupportFragmentManager()
-//                .beginTransaction()
-//                .detach(fragment)
-//                .commitAllowingStateLoss();
         return true;
     }
 
@@ -200,10 +201,6 @@ public class AndroidUIDebugOutput implements DebugOutput, Application.ActivityLi
         if (fragment == null) {
             return false;
         }
-//        activity.getFragmentManager()
-//                .beginTransaction()
-//                .detach(fragment)
-//                .commitAllowingStateLoss();
         activity.getFragmentManager().popBackStack();
         return true;
     }

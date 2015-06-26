@@ -88,6 +88,6 @@ public class MainActivity extends Activity {
     }
 
     private void throwException() {
-        throw new IllegalStateException("Testing uncaught exception");
+//        throw new IllegalStateException("Testing uncaught exception");
     }
 }

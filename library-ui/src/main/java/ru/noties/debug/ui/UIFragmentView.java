@@ -3,42 +3,198 @@ package ru.noties.debug.ui;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.Nullable;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.EditText;
+import android.widget.ListPopupWindow;
 import android.widget.ListView;
+import android.widget.TextView;
 
+import ru.noties.debug.Level;
 import ru.noties.debug.ui.model.LogItem;
+import ru.noties.debug.ui.model.LogItemFilter;
 import ru.noties.debug.ui.model.UIFragmentAdapter;
 import ru.noties.storm.StormIterator;
 import ru.noties.storm.adapter.BaseStormIteratorAdapter;
+import ru.noties.storm.pool.ObjectPool;
 
 /**
  * Created by Dimitry Ivanov on 26.06.2015.
  */
 public class UIFragmentView implements Parcelable {
 
+    public interface OnFilterListener {
+        void onFilterChange(LogItemFilter filter);
+    }
+
     private static final String ARG_SAVED_STATE = "arg.SavedState";
+    private static final String ARG_FILTER = "arg.Filter";
 
     private ListView mListView;
     private BaseStormIteratorAdapter<LogItem> mAdapter;
+    private OnFilterListener mOnFilterListener;
 
     private int[] mSavedState;
     private boolean mIsInitialLoad;
+    private LogItemFilter mFilter;
 
     public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle sis) {
+
         final View view = inflater.inflate(R.layout.fragment_view, parent, false);
         mListView = (ListView) view.findViewById(R.id.debug_ui_list_view);
+        mListView.setEmptyView(view.findViewById(R.id.debug_list_view_empty_view));
         mAdapter = new UIFragmentAdapter(inflater.getContext(), new LogItem[50]);
         mListView.setAdapter(mAdapter);
 
         if (sis != null) {
             mSavedState = sis.getIntArray(ARG_SAVED_STATE);
+            mFilter = sis.getParcelable(ARG_FILTER);
         } else {
             mIsInitialLoad = true;
         }
 
+        final TextView levelFilter = (TextView) view.findViewById(R.id.debug_view_level_filter);
+        initLevelFilter(levelFilter);
+
+        final EditText tagFilter = (EditText) view.findViewById(R.id.debug_view_tag_filter);
+        initTagFilter(tagFilter);
+
         return view;
+    }
+
+    private void initLevelFilter(final TextView textView) {
+        textView.setText(getFilterString());
+        textView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+                final ListPopupWindow popupWindow = new ListPopupWindow(textView.getContext());
+                popupWindow.setAnchorView(textView);
+                popupWindow.setWidth(ListPopupWindow.WRAP_CONTENT);
+                popupWindow.setHeight(ListPopupWindow.WRAP_CONTENT);
+                popupWindow.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        final String value = (String) parent.getAdapter().getItem(position);
+                        Level level;
+                        try {
+                            level = Level.valueOf(value);
+                        } catch (IllegalArgumentException e) {
+                            level = null;
+                        }
+                        if (updateFilter(level)) {
+                            textView.setText(getFilterString());
+                            sendUpdatedFilter();
+                        }
+                        popupWindow.dismiss();
+                    }
+                });
+                final Level[] levels = Level.values();
+                final String[] items = new String[levels.length + 1];
+                for (int i = 0, size = levels.length; i < size; i++) {
+                    items[i] = levels[i].name();
+                }
+                items[items.length - 1] = "All";
+                popupWindow.setAdapter(new ArrayAdapter<String>(textView.getContext(), android.R.layout.simple_list_item_1, items));
+                popupWindow.show();
+            }
+        });
+    }
+
+    private void initTagFilter(EditText editText) {
+        editText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                final String text = s.length() == 0 ? null : s.toString();
+                if (updateFilter(text)) {
+                    sendUpdatedFilter();
+                }
+            }
+        });
+    }
+
+    private String getFilterString() {
+        final Level level = mFilter == null ? null : mFilter.getLevel();
+        if (level == null) {
+            return "ALL";
+        }
+        return level.name();
+    }
+
+    private boolean updateFilter(Level level) {
+        if (level == null) {
+
+            if (mFilter == null) {
+                return false;
+            }
+
+            if (mFilter.getTag() == null) {
+                mFilter = null;
+            } else {
+                mFilter.setLevel(null);
+            }
+            return true;
+        }
+
+        final Level current = mFilter == null ? null : mFilter.getLevel();
+        if (level.equals(current)) {
+            return false;
+        }
+
+        if (mFilter == null) {
+            mFilter = new LogItemFilter();
+        }
+
+        mFilter.setLevel(level);
+        return true;
+    }
+
+    private boolean updateFilter(String tag) {
+        if (tag == null) {
+            if (mFilter == null) {
+                return false;
+            }
+
+            if (mFilter.getLevel() == null) {
+                mFilter = null;
+            } else {
+                mFilter.setTag(null);
+            }
+            return true;
+        }
+
+        final String current = mFilter == null ? null : mFilter.getTag();
+        if (tag.equals(current)) {
+            return false;
+        }
+
+        if (mFilter == null) {
+            mFilter = new LogItemFilter();
+        }
+
+        mFilter.setTag(tag);
+        return true;
+    }
+
+    private void sendUpdatedFilter() {
+        if (mOnFilterListener != null) {
+            mOnFilterListener.onFilterChange(mFilter);
+        }
     }
 
     public void onSaveInstanceState(Bundle out) {
@@ -47,10 +203,16 @@ public class UIFragmentView implements Parcelable {
             final View view = mListView.getChildAt(0);
             out.putIntArray(ARG_SAVED_STATE, new int[] { firstPosition, view != null ? view.getTop() : 0 });
         }
+        out.putParcelable(ARG_FILTER, mFilter);
     }
 
     public void setIterator(StormIterator<LogItem> iterator) {
         if (mAdapter != null) {
+
+            if (iterator == null) {
+                iterator = new DummyIterator<>();
+            }
+
             mAdapter.setIterator(iterator, true, true);
             if (mSavedState != null) {
                 mListView.post(new Runnable() {
@@ -72,6 +234,14 @@ public class UIFragmentView implements Parcelable {
         }
     }
 
+    public void setOnFilterListener(OnFilterListener listener) {
+        this.mOnFilterListener = listener;
+        if (mFilter != null
+                && mOnFilterListener != null) {
+            mOnFilterListener.onFilterChange(mFilter);
+        }
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -79,6 +249,7 @@ public class UIFragmentView implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+
     }
 
     public UIFragmentView() {
@@ -96,4 +267,34 @@ public class UIFragmentView implements Parcelable {
             return new UIFragmentView[size];
         }
     };
+
+    private static class DummyIterator<T> implements StormIterator<T> {
+
+        @Override
+        public int getCount() {
+            return 0;
+        }
+
+        @Nullable
+        @Override
+        public T get(int i) {
+            return null;
+        }
+
+        @Override
+        public void close() {
+
+        }
+
+        @Override
+        public void setObjectPool(ObjectPool<T> objectPool) {
+
+        }
+
+        @Nullable
+        @Override
+        public ObjectPool<T> getObjectPool() {
+            return null;
+        }
+    }
 }
