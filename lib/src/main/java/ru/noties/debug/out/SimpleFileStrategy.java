@@ -1,7 +1,5 @@
 package ru.noties.debug.out;
 
-import android.content.Context;
-
 import java.io.File;
 import java.io.IOException;
 
@@ -19,18 +17,6 @@ public class SimpleFileStrategy implements FileDebugOutput.FileStrategy {
 
     public interface LogFileNameStrategy {
         String create();
-    }
-
-    public static SimpleFileStrategy newInstance(
-            Context context,
-            String logFolderName,
-            LogFileNameStrategy logFileNameStrategy
-    ) throws InitializationException {
-        return SimpleFileStrategy.newInstance(
-                context.getCacheDir(),
-                logFolderName,
-                logFileNameStrategy
-        );
     }
 
     public static SimpleFileStrategy newInstance(

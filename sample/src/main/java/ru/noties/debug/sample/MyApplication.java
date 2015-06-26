@@ -9,11 +9,11 @@ import java.util.List;
 
 import ru.noties.debug.Debug;
 import ru.noties.debug.out.AndroidLogDebugOutput;
-import ru.noties.debug.out.AndroidUIDebugOutput;
 import ru.noties.debug.out.DebugOutput;
 import ru.noties.debug.out.DebugOutputFacade;
 import ru.noties.debug.out.FileDebugOutput;
 import ru.noties.debug.out.SimpleFileStrategy;
+import ru.noties.debug.ui.AndroidUIDebugOutput;
 
 /**
  * Created by dimaster on 05.10.14.
@@ -28,6 +28,7 @@ public class MyApplication extends Application {
 
         final List<DebugOutput> debugOutputs = new ArrayList<>();
         debugOutputs.add(new AndroidLogDebugOutput(isDebug));
+        debugOutputs.add(new AndroidUIDebugOutput(this, isDebug));
         final DebugOutput fileOutput = getFileOutput(getApplicationContext(), isDebug);
         if (fileOutput != null) {
             debugOutputs.add(fileOutput);
