@@ -30,6 +30,8 @@ public class MainActivity extends Activity {
         Debug.e("ok");
 
         methodWithTimerNano();
+
+        throwException();
     }
 
     private void someMethod(int x, int x2, String y) {
@@ -83,5 +85,9 @@ public class MainActivity extends Activity {
                 Debug.i(timer.toString());
             }
         }).start();
+    }
+
+    private void throwException() {
+        throw new IllegalStateException("Testing uncaught exception");
     }
 }

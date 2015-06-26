@@ -13,6 +13,7 @@ import ru.noties.debug.out.DebugOutput;
 import ru.noties.debug.out.DebugOutputFacade;
 import ru.noties.debug.out.FileDebugOutput;
 import ru.noties.debug.out.SimpleFileStrategy;
+import ru.noties.debug.out.UncaughtExceptionDebugOutput;
 import ru.noties.debug.ui.AndroidUIDebugOutput;
 
 /**
@@ -29,6 +30,7 @@ public class MyApplication extends Application {
         final List<DebugOutput> debugOutputs = new ArrayList<>();
         debugOutputs.add(new AndroidLogDebugOutput(isDebug));
         debugOutputs.add(new AndroidUIDebugOutput(this, isDebug));
+        debugOutputs.add(new UncaughtExceptionDebugOutput());
         final DebugOutput fileOutput = getFileOutput(getApplicationContext(), isDebug);
         if (fileOutput != null) {
             debugOutputs.add(fileOutput);
