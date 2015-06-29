@@ -29,7 +29,9 @@ public class DebugOutputFacade implements DebugOutput {
     public void log(Level level, Throwable throwable, String tag, String message) {
         //noinspection ForLoopReplaceableByForEach
         for (int i = 0, size = outputs.length; i < size; i++) {
-            outputs[i].log(level, throwable, tag, message);
+            if (outputs[i].isDebug()) {
+                outputs[i].log(level, throwable, tag, message);
+            }
         }
     }
 

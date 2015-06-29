@@ -2,5 +2,6 @@
 <resources>
 
     <color name="debug_text_color_main">#FFeeeeee</color>
+    <color name="debug_text_color_hint">#80eeeeee</color>
     <color name="debug_text_color_level_error">#FFff6653</color>
 </resources>

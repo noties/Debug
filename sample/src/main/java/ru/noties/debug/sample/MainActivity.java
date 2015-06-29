@@ -1,7 +1,7 @@
 package ru.noties.debug.sample;
 
-import android.app.Activity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 
 import java.util.Random;
 
@@ -9,12 +9,19 @@ import ru.noties.debug.Debug;
 import ru.noties.debug.Timer;
 import ru.noties.debug.TimerType;
 
-public class MainActivity extends Activity {
+public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        if (savedInstanceState == null) {
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .add(R.id.content, new MainFragment())
+                    .commit();
+        }
 
         // Trace current method calls chain
         Debug.trace(100);

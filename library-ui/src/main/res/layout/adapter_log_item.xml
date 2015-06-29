@@ -5,5 +5,6 @@
     android:layout_height="wrap_content"
     android:padding="8dip"
     android:textColor="#FFeeeeee"
+    android:textIsSelectable="true"
     android:textAppearance="?android:attr/textAppearanceSmall"
     android:id="@+id/debug_ui_adapter_text" />

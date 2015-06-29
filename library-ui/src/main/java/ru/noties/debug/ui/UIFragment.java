@@ -49,17 +49,8 @@ public class UIFragment extends Fragment implements LoaderManager.LoaderCallback
         if (fragmentView == null) {
             return null;
         }
-        final View view = fragmentView.onCreateView(inflater, parent, sis);
-        fragmentView.setOnFilterListener(new UIFragmentView.OnFilterListener() {
-            @Override
-            public void onFilterChange(LogItemFilter filter) {
-                final Loader<StormIterator<LogItem>> loader = getLoaderManager().getLoader(0);
-                if (loader != null) {
-                    ((LogLoader) loader).setLogFilter(filter);
-                }
-            }
-        });
-        return view;
+
+        return fragmentView.onCreateView(inflater, parent, sis);
     }
 
     @Override
@@ -73,13 +64,24 @@ public class UIFragment extends Fragment implements LoaderManager.LoaderCallback
         super.onStart();
 
         getLoaderManager().initLoader(0, null, this);
+        getUIView().setOnFilterListener(new UIFragmentView.OnFilterListener() {
+            @Override
+            public void onFilterChange(LogItemFilter filter) {
+                if (!isAdded()) {
+                    return;
+                }
+                final Loader<StormIterator<LogItem>> loader = getLoaderManager().getLoader(0);
+                if (loader != null) {
+                    ((LogLoader) loader).setLogFilter(filter);
+                }
+            }
+        });
     }
 
     @Override
     public void onStop() {
         super.onStop();
 
-//        getUIView().setIterator(null);
         getLoaderManager().destroyLoader(0);
     }
 

@@ -23,3 +23,5 @@ dependencies {
     compile 'com.android.support:support-v4:22.2.0'
     compile 'ru.noties:storm:1.0.3'
 }
+
+apply from: 'https://raw.githubusercontent.com/chrisbanes/gradle-mvn-push/master/gradle-mvn-push.gradle'

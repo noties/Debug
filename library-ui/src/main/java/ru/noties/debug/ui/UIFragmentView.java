@@ -1,5 +1,6 @@
 package ru.noties.debug.ui;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -34,7 +35,6 @@ public class UIFragmentView implements Parcelable {
     }
 
     private static final String ARG_SAVED_STATE = "arg.SavedState";
-    private static final String ARG_FILTER = "arg.Filter";
 
     private ListView mListView;
     private BaseStormIteratorAdapter<LogItem> mAdapter;
@@ -43,8 +43,19 @@ public class UIFragmentView implements Parcelable {
     private int[] mSavedState;
     private boolean mIsInitialLoad;
     private LogItemFilter mFilter;
+    private UIPrefs mPrefs;
 
     public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle sis) {
+
+        mPrefs = new UIPrefs(inflater.getContext());
+        final Level level = mPrefs.getLevel();
+        final String tag = mPrefs.getTag();
+        if (level != null
+                || tag != null) {
+            mFilter = new LogItemFilter()
+                    .setTag(tag)
+                    .setLevel(level);
+        }
 
         final View view = inflater.inflate(R.layout.fragment_view, parent, false);
         mListView = (ListView) view.findViewById(R.id.debug_ui_list_view);
@@ -54,7 +65,6 @@ public class UIFragmentView implements Parcelable {
 
         if (sis != null) {
             mSavedState = sis.getIntArray(ARG_SAVED_STATE);
-            mFilter = sis.getParcelable(ARG_FILTER);
         } else {
             mIsInitialLoad = true;
         }
@@ -73,9 +83,11 @@ public class UIFragmentView implements Parcelable {
         textView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View v) {
-                final ListPopupWindow popupWindow = new ListPopupWindow(textView.getContext());
+                final Context context = v.getContext();
+                final ListPopupWindow popupWindow = new ListPopupWindow(context);
+                final int popupWindowWidth = context.getResources().getDimensionPixelSize(R.dimen.debug_pop_up_window_width);
                 popupWindow.setAnchorView(textView);
-                popupWindow.setWidth(ListPopupWindow.WRAP_CONTENT);
+                popupWindow.setWidth(popupWindowWidth);
                 popupWindow.setHeight(ListPopupWindow.WRAP_CONTENT);
                 popupWindow.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
@@ -89,6 +101,7 @@ public class UIFragmentView implements Parcelable {
                         }
                         if (updateFilter(level)) {
                             textView.setText(getFilterString());
+                            updateLevel(level);
                             sendUpdatedFilter();
                         }
                         popupWindow.dismiss();
@@ -100,13 +113,17 @@ public class UIFragmentView implements Parcelable {
                     items[i] = levels[i].name();
                 }
                 items[items.length - 1] = "All";
-                popupWindow.setAdapter(new ArrayAdapter<String>(textView.getContext(), android.R.layout.simple_list_item_1, items));
+                popupWindow.setAdapter(new ArrayAdapter<String>(context, android.R.layout.simple_list_item_1, items));
                 popupWindow.show();
             }
         });
     }
 
     private void initTagFilter(EditText editText) {
+        final String tag = mFilter != null ? mFilter.getTag() : null;
+        if (tag != null) {
+            editText.setText(tag);
+        }
         editText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -122,6 +139,7 @@ public class UIFragmentView implements Parcelable {
             public void afterTextChanged(Editable s) {
                 final String text = s.length() == 0 ? null : s.toString();
                 if (updateFilter(text)) {
+                    updateTag(text);
                     sendUpdatedFilter();
                 }
             }
@@ -191,6 +209,14 @@ public class UIFragmentView implements Parcelable {
         return true;
     }
 
+    private void updateTag(String tag) {
+        mPrefs.setTag(tag);
+    }
+
+    private void updateLevel(Level level) {
+        mPrefs.setLevel(level);
+    }
+
     private void sendUpdatedFilter() {
         if (mOnFilterListener != null) {
             mOnFilterListener.onFilterChange(mFilter);
@@ -203,7 +229,6 @@ public class UIFragmentView implements Parcelable {
             final View view = mListView.getChildAt(0);
             out.putIntArray(ARG_SAVED_STATE, new int[] { firstPosition, view != null ? view.getTop() : 0 });
         }
-        out.putParcelable(ARG_FILTER, mFilter);
     }
 
     public void setIterator(StormIterator<LogItem> iterator) {
