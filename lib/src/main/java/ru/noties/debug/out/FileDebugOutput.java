@@ -38,6 +38,7 @@ public class FileDebugOutput implements DebugOutput {
     }
 
     public interface OutputConverter {
+
         String convert(Level level, Throwable throwable, String tag, String message);
 
         class DefaultOutputConverter implements OutputConverter {

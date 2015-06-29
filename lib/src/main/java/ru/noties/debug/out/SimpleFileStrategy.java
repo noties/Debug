@@ -2,6 +2,7 @@ package ru.noties.debug.out;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Date;
 
 /**
  * Created by Dimitry Ivanov on 25.06.2015.
@@ -16,7 +17,25 @@ public class SimpleFileStrategy implements FileDebugOutput.FileStrategy {
     }
 
     public interface LogFileNameStrategy {
+
         String create();
+
+        class DefaultLogFileNameStrategy implements LogFileNameStrategy {
+
+            private static final String PATTERN = "%d_%s";
+
+            @Override
+            public String create() {
+                return String.format(PATTERN, System.currentTimeMillis(), new Date());
+            }
+        }
+    }
+
+    public static SimpleFileStrategy newInstance(
+            File folder,
+            String logFolderName
+    ) throws InitializationException {
+        return newInstance(folder, logFolderName, new LogFileNameStrategy.DefaultLogFileNameStrategy());
     }
 
     public static SimpleFileStrategy newInstance(
@@ -26,7 +45,7 @@ public class SimpleFileStrategy implements FileDebugOutput.FileStrategy {
     ) throws InitializationException {
         if (!folder.exists()) {
             if (!folder.mkdirs()) {
-                throw new InitializationException("Could not obtain application's cache dir, path: " + folder.getAbsolutePath());
+                throw new InitializationException("Could not obtain parent folder for logs, path: " + folder.getAbsolutePath());
             }
         }
         final File logsFolder = new File(folder, logFolderName);

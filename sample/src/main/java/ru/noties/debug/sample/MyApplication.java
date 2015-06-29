@@ -42,15 +42,7 @@ public class MyApplication extends Application {
     private static DebugOutput getFileOutput(Context appContext, boolean isDebug) {
         //noinspection TryWithIdenticalCatches
         try {
-            return FileDebugOutput.newInstance(isDebug, true, SimpleFileStrategy.newInstance(appContext.getExternalCacheDir(), "debug_logs", new SimpleFileStrategy.LogFileNameStrategy() {
-
-                private static final String PATTERN = "%d_%s";
-
-                @Override
-                public String create() {
-                    return String.format(PATTERN, System.currentTimeMillis(), new Date());
-                }
-            }));
+            return FileDebugOutput.newInstance(isDebug, true, SimpleFileStrategy.newInstance(appContext.getExternalCacheDir(), "debug_logs"));
         } catch (FileDebugOutput.UnableToObtainFileException e) {
             e.printStackTrace();
         } catch (SimpleFileStrategy.InitializationException e) {

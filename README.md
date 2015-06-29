@@ -14,28 +14,23 @@ Library provides the ability to jump to the source right from the logcat output.
 
 
 It has no impact on release code - no additional information will be collected at runtime (aka stacktrace).
-The only thing is no do is to send a bool to the Debug.init() method. If you are using 
-Gradle - it just simplifies the initialization to a line of code:
-```java
-Debug.init(BuildConfig.DEBUG);
-```
-Well, if you are not using Gradle, where surely **must** be a way...
 
 Note that if you are using this library in multi-process application, you must call `Debug.init(boolean)` for every process.
 
 
-Also, it wraps String.format(), so you can create any message with nearly any 
+Also, it wraps String.format(), so you can create any message with nearly any
 quantity of variables to check at almost no pain (and time).
 
 
-### What's new (1.1.3
-* Decreased number of method calls inside Debug.java
-* Empty Timer implementation if !isDebug
+## What's new (2.0.0)
+Added a concept of `DebugOuput`. Now different *out* policies can be configured. For example, if you wish to write debug logs not only to logcat, but also to a file or send to a server or whatever you wish to do with data, it now could be easily done. I bundled library with these outs (`ru.noties.debug.out`):
+* `AndroidLogDebugOutput` - simple logcat
+* `FileDebugOutput` - writing to a file
+* `UncaughtExceptionDebugOutput` - logging of uncaught exceptions (which would be passed to `Debug.e()`)
+* `DebugOutputFacade` - to wrap more than one `DebugOutput`
 
+Of cause, you could easily create your own output - just implement `ru.noties.debug.out.DebugOutput` and pass it to `Debug` while initialization.
 
-### What's new (1.1.2)
-* Methods in logcat are now clickable
-* Small change to trace pattern to exclude Debug.java
 
 ### How to do it
 
@@ -57,7 +52,7 @@ compile 'ru.noties:debug:x.x.x'
 ```
 
 The best place to initialise Debug library is an Application's onCreate() method.
-Debug.init() takes a boolean indicating whether logging should be done or skipped.
+`Debug.init()` method takes one `DebugOutput` as a parameter.
 
 ```java
 public class DebugApplication extends Application {
@@ -66,9 +61,122 @@ public class DebugApplication extends Application {
     public void onCreate() {
         super.onCreate();
 
-        Debug.init(BuildConfig.DEBUG);
+        Debug.init(new AndroidLogDebugOutput(BuildConfig.DEBUG));
     }
 }
+```
+
+If you wish to customize the output policy it could be easily done with `DebugOutputFacade`
+
+```java
+final boolean isDebug = BuildConfig.DEBUG;
+final DebugOutputFacade output = DebugOutputFacade.newInstance(
+    new AndroidLogDebugOutput(isDebug),
+    new UncaughtExceptionDebugOutput(isDebug),
+    ...
+);
+Debug.init(output);
+```
+
+#### DebugOutput
+Common interface to configure Debug output
+```java
+public interface DebugOutput {
+    void log(Level level, Throwable throwable, String tag, String message);
+    boolean isDebug();
+}
+```
+
+#### UncaughtExceptionDebugOutput
+Logs uncaught exceptions (aka `Force close`) and passes it to `Debug.e()`
+
+#### FileDebugOutput
+Could be used to write Debug logs to a file. Should be obtained via static methods `newInstance`
+```java
+public static FileDebugOutput newInstance(
+        boolean isDebug,
+        boolean isAsync,
+        FileStrategy fileStrategy
+) throws UnableToObtainFileException { ... }
+```
+or
+```java
+public static FileDebugOutput newInstance(
+        boolean isDebug,
+        boolean isAsync,
+        FileStrategy fileStrategy,
+        OutputConverter outputConverter
+) throws UnableToObtainFileException { ... }
+```
+`isDebug` - indicates whether DebugOutput is active and should write logs
+
+`isAsync` - indicates whether writing should be done in a background thread (since it's IO)
+
+**FileStrategy**
+```java
+public interface FileStrategy {
+    File newSession() throws UnableToObtainFileException;
+}
+```
+If no major customization is needed `SimpleFileStrategy` could be used.
+```java
+public static SimpleFileStrategy newInstance(
+        File folder,
+        String logFolderName
+) throws InitializationException { ... }
+```
+or
+```java
+public static SimpleFileStrategy newInstance(
+        File folder,
+        String logFolderName,
+        LogFileNameStrategy logFileNameStrategy
+) throws InitializationException { ... }
+```
+
+**OutputConverter**
+
+Used to convert log message into String
+```java
+public interface OutputConverter {
+    String convert(Level level, Throwable throwable, String tag, String message);
+}
+```
+
+So, the initialization of `FileDebugOutput` could look like:
+```java
+private static DebugOutput getFileOutput(Context appContext, boolean isDebug) {
+    try {
+        return FileDebugOutput.newInstance(
+            isDebug,
+            true,
+            SimpleFileStrategy.newInstance(appContext.getExternalCacheDir(), "debug_logs")
+        );
+    } catch (FileDebugOutput.UnableToObtainFileException e) {
+        e.printStackTrace(); // Debug library is not initialized yet, we could not pass this throwable to it
+    } catch (SimpleFileStrategy.InitializationException e) {
+        e.printStackTrace();
+    }
+    return null;
+}
+```
+
+## Debug-UI
+[![Maven Central](https://img.shields.io/maven-central/v/ru.noties/debug-ui.svg)](http://search.maven.org/#search|ga|1|g%3A%22ru.noties%22%20AND%20a%3A%22debug-ui%22)
+```groovy
+compile 'ru.noties:debug-ui:x.x.x'
+compile 'ru.noties:storm:1.0.3' // required dependancy for writing logs to SQLite database
+```
+Debug-UI is a standalone library for visualizing Debug logs at your device for SDK_INT >= 14.
+
+![debug-ui](https://raw.githubusercontent.com/noties/Debug/master/pics/debug-ui.png)
+![debug-ui-expand](https://raw.githubusercontent.com/noties/Debug/master/pics/debug-ui-expand.png)
+
+```java
+final DebugOutput uiOutput = new AndroidUIDebugOutput(
+    mApplication, // Application
+    BuildConfig.DEBUG
+);
 ```
 
 ### Usage
@@ -121,41 +229,3 @@ Output:
 
 Output millis:
 ![timer](https://raw.githubusercontent.com/noties/Debug/master/pics/timer.png)
-
-
-### ~~What's next?~~ @Deprecated - Do not use this, as long as you can lose your own live templates
-
-If you are using Intellij Idea or Android Studio, you can make debugging even simpler.
-I wrote some Live Templates for this lib.
-Download *ru.noties.debug.live_templates.jar* and import it in your IDE. After that you could do something like that:
-
-```
-    di
-    de
-    dw
-    dd
-    dv
-```
-
-and hit tab (once at a time of cause), you will get:
-
-```java
-    Debug.i("", );
-    Debug.e("", );
-    Debug.w("", );
-    Debug.d("", );
-    Debug.v("", );
-```
-
-
-also, there are **dii**, **dee**, **dww**, **ddd** and **dvv**. After typing them you will get:
-
-```java
-    Debug.e("view: %s, firstVisibleItem: %s, visibleItemCount: %s, totalItemCount: %s", view, firstVisibleItem, visibleItemCount, totalItemCount);
-    Debug.i("view: %s, firstVisibleItem: %s, visibleItemCount: %s, totalItemCount: %s", view, firstVisibleItem, visibleItemCount, totalItemCount);
-    Debug.v("view: %s, firstVisibleItem: %s, visibleItemCount: %s, totalItemCount: %s", view, firstVisibleItem, visibleItemCount, totalItemCount);
-    Debug.d("view: %s, firstVisibleItem: %s, visibleItemCount: %s, totalItemCount: %s", view, firstVisibleItem, visibleItemCount, totalItemCount);
-    Debug.w("view: %s, firstVisibleItem: %s, visibleItemCount: %s, totalItemCount: %s", view, firstVisibleItem, visibleItemCount, totalItemCount);
-```
-
-for a OnScrollListener.onScroll() method. Yes, the pattern will be created from method's parameters and you will not have to write it yourself.
