@@ -96,8 +96,10 @@ class SimpleTimer implements Timer {
         for (Holder holder: mList) {
 
             builder.append("\n")
-                    .append(holder.type.value)
-                    .append(getWhenString(last, holder.when));
+                    .append(holder.type.value);
+            if (holder.type != Type.START) {
+                builder.append(getWhenString(last, holder.when));
+            }
             msg = getMessage(holder.message, holder.args);
             if (msg != null) {
                 builder.append(", ")
@@ -157,8 +159,8 @@ class SimpleTimer implements Timer {
 
     private enum Type {
 
-        TICK    ("\t+ "),
-        START   ("start, "),
+        TICK    ("\u00a0    + "),
+        START   ("start"),
         STOP    ("stop, ");
 
         final String value;
