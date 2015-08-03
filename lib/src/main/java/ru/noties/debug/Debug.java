@@ -126,6 +126,10 @@ public class Debug {
         log(Level.E, throwable, null);
     }
 
+    public static void e(Object o) {
+        log(Level.E, null, String.valueOf(o));
+    }
+
     public static void w(Throwable throwable, String message, Object... args) {
         log(Level.W, throwable, message, args);
     }
@@ -136,6 +140,10 @@ public class Debug {
 
     public static void w() {
         log(Level.W, null, null);
+    }
+
+    public static void w(Object o) {
+        log(Level.W, null, String.valueOf(o));
     }
 
     public static void i(Throwable throwable, String message, Object... args) {
@@ -150,6 +158,10 @@ public class Debug {
         log(Level.I, null, null);
     }
 
+    public static void i(Object o) {
+        log(Level.I, null, String.valueOf(o));
+    }
+
     public static void d(Throwable throwable, String message, Object... args) {
         log(Level.D, throwable, message, args);
     }
@@ -160,6 +172,10 @@ public class Debug {
 
     public static void d() {
         log(Level.D, null, null);
+    }
+
+    public static void d(Object o) {
+        log(Level.D, null, String.valueOf(o));
     }
 
     public static void v(Throwable throwable, String message, Object... args) {
@@ -174,6 +190,10 @@ public class Debug {
         log(Level.V, null, null);
     }
 
+    public static void v(Object o) {
+        log(Level.V, null, String.valueOf(o));
+    }
+
     public static void wtf() {
         log(Level.WTF, null, null);
     }
@@ -184,6 +204,10 @@ public class Debug {
 
     public static void wtf(Throwable throwable, String message, Object... args) {
         log(Level.WTF, throwable, message, args);
+    }
+
+    public static void wtf(Object o) {
+        log(Level.WTF, null, String.valueOf(o));
     }
 
     static String getLogMessage(String message, Object... args) {

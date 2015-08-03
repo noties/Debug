@@ -39,6 +39,8 @@ public class MainActivity extends AppCompatActivity {
         methodWithTimerNano();
 
         throwException();
+
+        objectPrint();
     }
 
     private void someMethod(int x, int x2, String y) {
@@ -96,5 +98,14 @@ public class MainActivity extends AppCompatActivity {
 
     private void throwException() {
 //        throw new IllegalStateException("Testing uncaught exception");
+    }
+
+    private void objectPrint() {
+        Debug.i(1);
+        Debug.d(1);
+        Debug.v(1);
+        Debug.w(1);
+        Debug.e(1);
+        Debug.wtf(1);
     }
 }

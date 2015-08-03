@@ -20,7 +20,7 @@ android {
 
 dependencies {
     compile project(':lib')
-    compile 'com.android.support:support-v4:22.2.0'
+    compile 'com.android.support:support-v4:22.2.1'
     compile 'ru.noties:storm:1.0.3'
 }
 
