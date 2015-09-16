@@ -1,7 +1,9 @@
 package ru.noties.debug;
 
-import ru.noties.debug.out.AndroidLogDebugOutput;
 import ru.noties.debug.out.DebugOutput;
+import ru.noties.debug.render.DebugRender;
+import ru.noties.debug.render.DebugRenderImpl;
+import ru.noties.debug.render.LogItem;
 
 public class Debug {
 
@@ -20,25 +22,29 @@ public class Debug {
         return local;
     }
 
-    private static final String THIS_FILE_NAME = "Debug.java";
-    private static final String STARTING_MESSAGE_PATTERN_LINK = "%1$s(%2$s:%3$d)";
-    private static final String TRACE_FIRST_LINE = "trace:\n";
+    private static final String FILE_NAME = "Debug.java";
 
     private DebugOutput output;
+    private DebugRender render;
     
     private Debug() {}
-
-    @Deprecated
-    public static void init(final boolean isDebug) {
-        Debug.getInstance().setOutput(new AndroidLogDebugOutput(isDebug));
-    }
     
     public static void init(DebugOutput debugOutput) {
-        Debug.getInstance().setOutput(debugOutput);
+        Debug.init(debugOutput, new DebugRenderImpl());
+    }
+
+    public static void init(DebugOutput debugOutput, DebugRender debugRender) {
+        final Debug debug = Debug.getInstance();
+        debug.output = debugOutput;
+        debug.render = debugRender;
     }
 
     public void setOutput(DebugOutput output) {
         this.output = output;
+    }
+
+    public void setRender(DebugRender render) {
+        this.render = render;
     }
     
     public static boolean isDebug() {
@@ -58,56 +64,6 @@ public class Debug {
             return new EmptyTimer();
         }
         return SimpleTimer.newInstance(name);
-    }
-
-    public static void trace() {
-        trace(Level.V, -1);
-    }
-
-    public static void trace(Level level) {
-        trace(level, -1);
-    }
-
-    public static void trace(int maxItems) {
-        trace(Level.V, maxItems);
-    }
-
-    public static void trace(Level level, int maxItems) {
-
-        if (!isDebug()) return;
-
-        final Throwable throwable = new Throwable();
-        final StringBuilder builder = new StringBuilder(TRACE_FIRST_LINE);
-
-        final StackTraceElement[] elements = throwable.getStackTrace();
-
-        String fileName;
-        String callerTag = null;
-
-        int items = 0;
-
-        for (StackTraceElement element: elements) {
-
-            fileName = element.getFileName();
-
-            if (THIS_FILE_NAME.equals(fileName)) {
-                continue;
-            }
-
-            if (callerTag == null) {
-                callerTag = fileName;
-            }
-
-            if (maxItems > 0 && ++items > maxItems) {
-                break;
-            }
-
-            builder.append("\tat ")
-                    .append(element.toString())
-                    .append('\n');
-        }
-
-        logTrace(level, new Holder(callerTag, builder.toString()));
     }
 
     public static void e(Throwable throwable, String message, Object... args) {
@@ -210,7 +166,53 @@ public class Debug {
         log(Level.WTF, null, String.valueOf(o));
     }
 
-    static String getLogMessage(String message, Object... args) {
+    static void log(Level level, Throwable throwable, String message, Object... args) {
+
+        final Debug debug = Debug.getInstance();
+        final DebugOutput output = debug.output;
+        final DebugRender render = debug.render;
+        if (output == null
+                || render == null
+                || !output.isDebug()) {
+            return;
+        }
+
+        final LogItem logItem = render.log(obtainStackTrace(), message, args);
+        if (logItem != null) {
+            output.log(level, throwable, logItem.tag, logItem.message);
+        }
+    }
+
+    public static void trace() {
+        trace(Level.V, -1);
+    }
+
+    public static void trace(Level level) {
+        trace(level, -1);
+    }
+
+    public static void trace(int maxItems) {
+        trace(Level.V, maxItems);
+    }
+
+    public static void trace(Level level, int maxItems) {
+
+        final Debug debug = Debug.getInstance();
+        final DebugOutput output = debug.output;
+        final DebugRender render = debug.render;
+        if (output == null
+                || render == null
+                || !output.isDebug()) {
+            return;
+        }
+
+        final LogItem logItem = render.trace(obtainStackTrace(), maxItems);
+        if (logItem != null) {
+            output.log(level, null, logItem.tag, logItem.message);
+        }
+    }
+
+    public static String getLogMessage(String message, Object[] args) {
         if (message == null) {
             return null;
         }
@@ -222,84 +224,33 @@ public class Debug {
         return String.format(message, args);
     }
 
-    private static Holder getHolder(String message, Object... args) {
+    private static StackTraceElement[] obtainStackTrace() {
 
         final StackTraceElement[] elements = new Throwable().getStackTrace();
+        final int length = elements.length;
+        final String debugFileName = FILE_NAME;
 
-        String fileName;
-        String methodName;
+        String elementName;
+        int start = -1;
 
-        int lineNumber;
+        for (int i = 0; i < length; i++) {
 
-        for(StackTraceElement element: elements) {
-
-            fileName = element.getFileName();
-
-            if(THIS_FILE_NAME.equals(fileName)) {
+            elementName = elements[i].getFileName();
+            if (debugFileName.equals(elementName)) {
                 continue;
             }
 
-            lineNumber = element.getLineNumber();
-            methodName = element.getMethodName();
-
-            final String startingMessage
-                    = String.format(STARTING_MESSAGE_PATTERN_LINK, methodName, fileName,  lineNumber);
-            final String logMessage = getLogMessage(message, args);
-            final String out;
-            if (logMessage != null) {
-                out = startingMessage + " : " + logMessage;
-            } else {
-                out = startingMessage;
-            }
-
-            return new Holder(fileName, out);
+            start = i;
+            break;
         }
 
-        return null;
-    }
-
-    private static void log(
-            final Level level,
-            final Throwable throwable,
-            final String message,
-            final Object... args
-    ) {
-
-        final Debug debug = Debug.getInstance();
-        final DebugOutput output = debug.output;
-        if (output == null
-                || !output.isDebug()) {
-            return;
+        if (start > 0) {
+            final int newLength = length - start;
+            final StackTraceElement[] out = new StackTraceElement[newLength];
+            System.arraycopy(elements, start, out, 0, newLength);
+            return out;
         }
 
-        final Holder holder = getHolder(message, args);
-        if (holder != null) {
-            output.log(level, throwable, holder.tag, holder.message);
-        }
-    }
-
-    private static void logTrace(
-            Level level,
-            Holder holder
-    ) {
-        final Debug debug = Debug.getInstance();
-        final DebugOutput output = debug.output;
-        if (output == null
-                || !output.isDebug()) {
-            return;
-        }
-
-        output.log(level, null, holder.tag, holder.message);
-    }
-
-    private static class Holder {
-
-        final String tag;
-        final String message;
-
-        Holder(String tag, String message) {
-            this.tag     = tag;
-            this.message = message;
-        }
+        return elements;
     }
 }
