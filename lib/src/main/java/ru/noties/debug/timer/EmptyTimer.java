@@ -1,4 +1,6 @@
-package ru.noties.debug;
+package ru.noties.debug.timer;
+
+import java.util.List;
 
 /**
  * Created by Dimitry Ivanov (mail@dimitryivanov.ru) on 30.03.2015.
@@ -35,5 +37,18 @@ public class EmptyTimer implements Timer {
 
     }
 
+    @Override
+    public TimerType getTimerType() {
+        return null;
+    }
 
+    @Override
+    public String getName() {
+        return null;
+    }
+
+    @Override
+    public List<TimerItem> getItems() {
+        return null;
+    }
 }

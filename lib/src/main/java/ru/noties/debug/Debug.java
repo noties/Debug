@@ -1,9 +1,16 @@
 package ru.noties.debug;
 
+import java.util.List;
+
 import ru.noties.debug.out.DebugOutput;
 import ru.noties.debug.render.DebugRender;
-import ru.noties.debug.render.DebugRenderImpl;
+import ru.noties.debug.render.DebugRenderBase;
 import ru.noties.debug.render.LogItem;
+import ru.noties.debug.timer.EmptyTimer;
+import ru.noties.debug.timer.SimpleTimer;
+import ru.noties.debug.timer.Timer;
+import ru.noties.debug.timer.TimerItem;
+import ru.noties.debug.timer.TimerType;
 
 public class Debug {
 
@@ -30,7 +37,7 @@ public class Debug {
     private Debug() {}
     
     public static void init(DebugOutput debugOutput) {
-        Debug.init(debugOutput, new DebugRenderImpl());
+        Debug.init(debugOutput, new DebugRenderBase());
     }
 
     public static void init(DebugOutput debugOutput, DebugRender debugRender) {
@@ -48,9 +55,15 @@ public class Debug {
     }
     
     public static boolean isDebug() {
-        final DebugOutput output = Debug.getInstance().output;
-        return output != null && output.isDebug();
+        final Debug debug = Debug.getInstance();
+        final DebugOutput output = debug.output;
+        final DebugRender render = debug.render;
+        return (output != null && render != null)
+                && output.isDebug();
     }
+
+
+    // Timer methods
 
     public static Timer newTimer(String name, TimerType type) {
         if (!isDebug()) {
@@ -64,6 +77,53 @@ public class Debug {
             return new EmptyTimer();
         }
         return SimpleTimer.newInstance(name);
+    }
+
+    public static void v(Timer timer) {
+        logTimer(Level.V, timer);
+    }
+
+    public static void d(Timer timer) {
+        logTimer(Level.D, timer);
+    }
+
+    public static void i(Timer timer) {
+        logTimer(Level.I, timer);
+    }
+
+    public static void w(Timer timer) {
+        logTimer(Level.W, timer);
+    }
+
+    public static void e(Timer timer) {
+        logTimer(Level.E, timer);
+    }
+
+    public static void wtf(Timer timer) {
+        logTimer(Level.WTF, timer);
+    }
+
+    private static void logTimer(Level level, Timer timer) {
+        if (!isDebug()) {
+            return;
+        }
+
+        final List<TimerItem> timerItems = timer.getItems();
+        if (timerItems == null) {
+            return;
+        }
+
+        final StackTraceElement[] elements = obtainStackTrace();
+        if (elements == null
+                || elements.length == 0) {
+            return;
+        }
+
+        final Debug debug = Debug.getInstance();
+        final LogItem logItem = debug.render.timer(elements[0], timer.getName(), timer.getTimerType(), timerItems);
+        if (logItem != null) {
+            debug.output.log(level, null, logItem.tag, logItem.message);
+        }
     }
 
     public static void e(Throwable throwable, String message, Object... args) {
@@ -168,18 +228,22 @@ public class Debug {
 
     static void log(Level level, Throwable throwable, String message, Object... args) {
 
-        final Debug debug = Debug.getInstance();
-        final DebugOutput output = debug.output;
-        final DebugRender render = debug.render;
-        if (output == null
-                || render == null
-                || !output.isDebug()) {
+        if (!isDebug()) {
             return;
         }
 
-        final LogItem logItem = render.log(obtainStackTrace(), message, args);
+        final StackTraceElement[] elements = obtainStackTrace();
+        if (elements == null
+                || elements.length == 0) {
+            // todo maybe additional logging?
+            return;
+        }
+
+        final Debug debug = Debug.getInstance();
+
+        final LogItem logItem = debug.render.log(elements[0], message, args);
         if (logItem != null) {
-            output.log(level, throwable, logItem.tag, logItem.message);
+            debug.output.log(level, throwable, logItem.tag, logItem.message);
         }
     }
 
@@ -197,18 +261,22 @@ public class Debug {
 
     public static void trace(Level level, int maxItems) {
 
-        final Debug debug = Debug.getInstance();
-        final DebugOutput output = debug.output;
-        final DebugRender render = debug.render;
-        if (output == null
-                || render == null
-                || !output.isDebug()) {
+        if (!isDebug()) {
             return;
         }
 
-        final LogItem logItem = render.trace(obtainStackTrace(), maxItems);
+        final StackTraceElement[] elements = obtainStackTrace();
+        if (elements == null
+                || elements.length == 0) {
+            // todo maybe additional logging?
+            return;
+        }
+
+        final Debug debug = Debug.getInstance();
+
+        final LogItem logItem = debug.render.trace(obtainStackTrace(), maxItems);
         if (logItem != null) {
-            output.log(level, null, logItem.tag, logItem.message);
+            debug.output.log(level, null, logItem.tag, logItem.message);
         }
     }
 
@@ -227,7 +295,12 @@ public class Debug {
     private static StackTraceElement[] obtainStackTrace() {
 
         final StackTraceElement[] elements = new Throwable().getStackTrace();
-        final int length = elements.length;
+        final int length = elements != null ? elements.length : 0;
+
+        if (length == 0) {
+            return null;
+        }
+
         final String debugFileName = FILE_NAME;
 
         String elementName;

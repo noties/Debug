@@ -6,8 +6,8 @@ import android.support.v7.app.AppCompatActivity;
 import java.util.Random;
 
 import ru.noties.debug.Debug;
-import ru.noties.debug.Timer;
-import ru.noties.debug.TimerType;
+import ru.noties.debug.timer.Timer;
+import ru.noties.debug.timer.TimerType;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -91,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 timer.stop();
-                Debug.i(timer.toString());
+                Debug.i(timer);
             }
         }).start();
     }
