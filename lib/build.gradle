@@ -5,14 +5,14 @@ repositories {
 }
 
 android {
-    compileSdkVersion 22
-    buildToolsVersion "22.0.1"
+    compileSdkVersion 23
+    buildToolsVersion "23.0.1"
 
     defaultConfig {
         minSdkVersion 8
-        targetSdkVersion 22
-        versionCode 7
-        versionName "2.0.1"
+        targetSdkVersion 23
+        versionCode 8
+        versionName "2.1.0"
     }
 
     sourceSets {
