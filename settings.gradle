@@ -1,2 +1,2 @@
-include ':sample', ':library-ui', ':apt'
+include ':sample', ':library-ui', ':apt', ':apt-annotations'
 include 'lib'
