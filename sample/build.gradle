@@ -1,4 +1,16 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath 'com.neenbedankt.gradle.plugins:android-apt:1.5.1'
+    }
+}
+
+
 apply plugin: 'com.android.application'
+apply plugin: 'com.neenbedankt.android-apt'
 
 android {
 
@@ -15,18 +27,21 @@ android {
     buildTypes {
 
         release {
-
+            buildConfigField 'boolean', 'IS_DEBUG', 'false'
         }
 
         debug {
-
+            buildConfigField 'boolean', 'IS_DEBUG', 'false'
         }
     }
 }
 
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
+
     compile project(':lib')
     compile project(':library-ui')
     compile 'com.android.support:appcompat-v7:23.2.0'
+
+    apt project(':apt-compiler')
+    provided project(':apt-annotations')
 }

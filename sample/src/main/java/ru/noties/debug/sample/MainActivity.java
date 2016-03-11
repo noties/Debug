@@ -2,6 +2,7 @@ package ru.noties.debug.sample;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.widget.Toast;
 
 import java.util.Random;
 
@@ -41,6 +42,8 @@ public class MainActivity extends AppCompatActivity {
         throwException();
 
         objectPrint();
+
+        labels();
     }
 
     private void someMethod(int x, int x2, String y) {
@@ -107,5 +110,12 @@ public class MainActivity extends AppCompatActivity {
         Debug.w(1);
         Debug.e(1);
         Debug.wtf(1);
+    }
+
+    private void labels() {
+        root: {
+            debug: Toast.makeText(this, "debug", Toast.LENGTH_LONG).show();
+            release: Toast.makeText(this, "release", Toast.LENGTH_LONG).show();
+        }
     }
 }

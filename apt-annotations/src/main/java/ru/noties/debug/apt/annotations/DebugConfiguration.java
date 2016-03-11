@@ -8,9 +8,8 @@ import java.lang.annotation.Target;
 /**
  * Created by Dimitry Ivanov on 10.03.2016.
  */
-@Retention(RetentionPolicy.SOURCE)
+@Retention(RetentionPolicy.CLASS)
 @Target(ElementType.TYPE)
 public @interface DebugConfiguration {
-    boolean isDebug();
-    String label();
+     String[] removeLabels();
 }
