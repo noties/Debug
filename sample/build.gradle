@@ -24,14 +24,15 @@ android {
         versionCode 5
         versionName "1.1.3"
     }
+
     buildTypes {
 
         release {
-            buildConfigField 'boolean', 'IS_DEBUG', 'false'
+            buildConfigField 'String', 'TAGS_TO_REMOVE', '\"debug\"'
         }
 
         debug {
-            buildConfigField 'boolean', 'IS_DEBUG', 'false'
+            buildConfigField 'String', 'TAGS_TO_REMOVE', '\"stats|tracking\"'
         }
     }
 }

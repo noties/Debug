@@ -11,5 +11,10 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.CLASS)
 @Target(ElementType.TYPE)
 public @interface DebugConfiguration {
-     String[] removeLabels();
+     /**
+      * Provide labels that must be removed from final build.
+      * Must be in the format `label1|label2|label3`, single values &amp; empty string are OK
+      * Please note, that these are the labels that WILL be removed
+      */
+     String removeLabels();
 }
