@@ -21,9 +21,27 @@ Note that if you are using this library in multi-process application, you must c
 Also, it wraps String.format(), so you can create any message with nearly any
 quantity of variables to check at almost no pain (and time).
 
+## Android Metaprogramming with `apt-compiler` & `apt-annotations`
+I've added a simple module to actually remove all the logging calls from the source code.
+I was not satisfied that all the logging was still present in release builds. Yes, the output was clean,
+but all the computations were there. For example:
+```java
+Debug.i("someValue1: %d, someValue2: %s, equals: %s", compute1(), compute2(), compute1().equals(compute2());
+```
+Will compute anyway all the values passed to the `i` call, but won't print them in release builds.
+Yes, logcat is clean, but we have computed these values, so we cannot say that this logging is completely harmless
+for application's performance. Please refer to the `README.md` in the `apt-compiler` module
+to get more information on how to achieve zero performance penalty for specific builds.
 
-## What's new (2.0.0)
-Added a concept of `DebugOuput`. Now different *out* policies can be configured. For example, if you wish to write debug logs not only to logcat, but also to a file or send to a server or whatever you wish to do with data, it now could be easily done. I bundled library with these outs (`ru.noties.debug.out`):
+
+## What's new (2.0.2)
+Added `jar` artifact for `lib` module.
+```gradle
+compile 'ru.noties:debug:2.0.2@jar
+```
+
+### What's new (2.0.0)
+Added a concept of `DebugOutput`. Now different *out* policies can be configured. For example, if you wish to write debug logs not only to logcat, but also to a file or send to a server or whatever you wish to do with data, it now could be easily done. I bundled library with these outs (`ru.noties.debug.out`):
 * `AndroidLogDebugOutput` - simple logcat
 * `FileDebugOutput` - writing to a file
 * `UncaughtExceptionDebugOutput` - logging of uncaught exceptions (which would be passed to `Debug.e()`)
