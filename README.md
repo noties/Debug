@@ -21,7 +21,7 @@ Note that if you are using this library in multi-process application, you must c
 Also, it wraps String.format(), so you can create any message with nearly any
 quantity of variables to check at almost no pain (and time).
 
-## Android Metaprogramming with `apt-compiler` & `apt-annotations`
+## Android Metaprogramming with `debug-compiler` & `debug-annotations`
 I've added a simple module to actually remove all the logging calls from the source code.
 I was not satisfied that all the logging was still present in release builds. Yes, the output was clean,
 but all the computations were there. For example:
@@ -37,7 +37,7 @@ to get more information on how to achieve zero performance penalty for specific 
 ## What's new (2.0.2)
 Added `jar` artifact for `lib` module.
 ```gradle
-compile 'ru.noties:debug:2.0.2@jar
+compile 'ru.noties:debug:2.0.2@jar'
 ```
 
 ### What's new (2.0.0)
