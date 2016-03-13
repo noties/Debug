@@ -1,6 +1,8 @@
 package ru.noties.debug.apt;
 
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.annotation.processing.AbstractProcessor;
@@ -54,17 +56,50 @@ public class DebugProcessor extends AbstractProcessor {
 
                 final TypeElement typeElement = (TypeElement) elements.iterator().next();
                 final DebugConfiguration debugConfiguration = typeElement.getAnnotation(DebugConfiguration.class);
-                final String removeLabels = debugConfiguration.removeLabels();
-                final String[] labels = removeLabels != null && removeLabels.length() > 0 ? removeLabels.split("\\|") : null;
-                if (labels != null
-                        && labels.length > 0) {
-                    final Set<? extends Element> root = roundEnv.getRootElements();
-                    final DebugTreeModifier treeModifier = DebugTreeModifier.newInstance(mProcessingEnvironment);
-                    treeModifier.modify(labels, root);
+
+                final String allLabelsString = debugConfiguration.allLabels();
+                final String[] allLabels = parseInput(allLabelsString);
+                if (allLabels != null && allLabels.length > 0) {
+
+                    final String enabledLabelsStrings = debugConfiguration.enabledLabels();
+                    final String[] enabledLabels = parseInput(enabledLabelsStrings);
+
+                    final String[] removeLabels;
+                    if (enabledLabels == null || enabledLabels.length == 0) {
+                        removeLabels = allLabels;
+                    } else {
+                        // intersect
+                        removeLabels = intersect(allLabels, enabledLabels);
+                    }
+
+                    if (removeLabels != null && removeLabels.length > 0) {
+                        final Set<? extends Element> root = roundEnv.getRootElements();
+                        final DebugTreeModifier treeModifier = DebugTreeModifier.newInstance(mProcessingEnvironment);
+                        treeModifier.modify(removeLabels, root);
+                    }
                 }
             }
         }
 
         return false;
+    }
+
+    private static String[] parseInput(String in) {
+        return in == null || in.length() == 0 ? null : in.split("\\|");
+    }
+
+    private static String[] intersect(String[] all, String[] enabled) {
+
+        final Set<String> set = new HashSet<>(Arrays.asList(all));
+
+        for (String label: enabled) {
+            set.remove(label);
+        }
+
+        if (set.size() == 0) {
+            return null;
+        }
+
+        return set.toArray(new String[set.size()]);
     }
 }

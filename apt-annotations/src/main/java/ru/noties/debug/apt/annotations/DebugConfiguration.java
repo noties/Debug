@@ -6,15 +6,14 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * Annotation to define labels to be processed.
+ * The format: `label|label2|label3` (single and empty strings are OK)
+ *
  * Created by Dimitry Ivanov on 10.03.2016.
  */
-@Retention(RetentionPolicy.CLASS)
+@Retention(RetentionPolicy.SOURCE)
 @Target(ElementType.TYPE)
 public @interface DebugConfiguration {
-     /**
-      * Provide labels that must be removed from final build.
-      * Must be in the format `label1|label2|label3`, single values &amp; empty string are OK
-      * Please note, that these are the labels that WILL be removed
-      */
-     String removeLabels();
+     String allLabels();
+     String enabledLabels();
 }

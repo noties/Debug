@@ -19,7 +19,7 @@ import ru.noties.debug.ui.AndroidUIDebugOutput;
 /**
  * Created by dimaster on 05.10.14.
  */
-@DebugConfiguration(removeLabels = BuildConfig.TAGS_TO_REMOVE)
+@DebugConfiguration(allLabels = BuildConfig.ALL_LABELS, enabledLabels = BuildConfig.ENABLED_LABELS)
 public class MyApplication extends Application {
 
     @Override

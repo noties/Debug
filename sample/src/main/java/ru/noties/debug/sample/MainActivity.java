@@ -115,13 +115,8 @@ public class MainActivity extends AppCompatActivity {
     private void labels() {
 
         debug: {
-            Debug.i("this thing will be removed if `debug` label is set to be removed, thus no message here");
+            Debug.i("this thing will be removed if `debug` label is set to be enabled, thus no message here");
             Toast.makeText(this, "debug", Toast.LENGTH_SHORT).show();
-        }
-
-        stats: {
-            // here we do some manipulations.. will be present in `release` build, but no present in `debug`
-            Toast.makeText(this, "stats", Toast.LENGTH_SHORT).show();
         }
 
         tracking: {
