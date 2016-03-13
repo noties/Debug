@@ -12,8 +12,7 @@ android {
     defaultConfig {
         minSdkVersion 8
         targetSdkVersion SDK_VERSION as int
-        versionCode 7
-        versionName "2.0.1"
+        versionName VERSION_NAME
     }
 
     sourceSets {
@@ -24,6 +23,19 @@ android {
         }
     }
 }
+
+task jar(type: Jar) {
+    from 'build/intermediates/classes/release'
+    exclude '**/BuildConfig.class'
+    exclude '**/R.class'
+}
+
+artifacts {
+    archives jar
+}
+
+version = VERSION_NAME
+group = GROUP
 
 apply from: 'https://raw.githubusercontent.com/chrisbanes/gradle-mvn-push/master/gradle-mvn-push.gradle'
 
