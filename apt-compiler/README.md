@@ -268,7 +268,7 @@ As you can see, nested labels are OK.
 ## License
 
 ```
-  Copyright 2015 Dimitry Ivanov (mail@dimitryivanov.ru)
+  Copyright 2016 Dimitry Ivanov (mail@dimitryivanov.ru)
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
