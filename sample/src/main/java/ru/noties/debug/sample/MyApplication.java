@@ -4,10 +4,10 @@ import android.app.Application;
 import android.content.Context;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import ru.noties.debug.Debug;
+import ru.noties.debug.apt.annotations.DebugConfiguration;
 import ru.noties.debug.out.AndroidLogDebugOutput;
 import ru.noties.debug.out.DebugOutput;
 import ru.noties.debug.out.DebugOutputFacade;
@@ -19,6 +19,7 @@ import ru.noties.debug.ui.AndroidUIDebugOutput;
 /**
  * Created by dimaster on 05.10.14.
  */
+@DebugConfiguration(allLabels = BuildConfig.ALL_LABELS, enabledLabels = BuildConfig.ENABLED_LABELS)
 public class MyApplication extends Application {
 
     @Override

@@ -2,6 +2,7 @@ package ru.noties.debug.sample;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.widget.Toast;
 
 import java.util.Random;
 
@@ -41,6 +42,8 @@ public class MainActivity extends AppCompatActivity {
         throwException();
 
         objectPrint();
+
+        labels();
     }
 
     private void someMethod(int x, int x2, String y) {
@@ -107,5 +110,22 @@ public class MainActivity extends AppCompatActivity {
         Debug.w(1);
         Debug.e(1);
         Debug.wtf(1);
+
+        Debug.i(new Object(){public String toString(){ return "";}});
+    }
+
+    private void labels() {
+
+        debug: {
+            Debug.i("this thing will be removed if `debug` label is set to be enabled, thus no message here");
+            Toast.makeText(this, "debug", Toast.LENGTH_SHORT).show();
+        }
+
+        tracking: {
+            // do some tracking, actual only for `release` build
+            Toast.makeText(this, "tracking", Toast.LENGTH_SHORT).show();
+        }
+
+        tracking: Toast.makeText(this, "one liner is also ok", Toast.LENGTH_SHORT).show();
     }
 }
