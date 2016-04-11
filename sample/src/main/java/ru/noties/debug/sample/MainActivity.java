@@ -110,6 +110,8 @@ public class MainActivity extends AppCompatActivity {
         Debug.w(1);
         Debug.e(1);
         Debug.wtf(1);
+
+        Debug.i(new Object(){public String toString(){ return "";}});
     }
 
     private void labels() {
