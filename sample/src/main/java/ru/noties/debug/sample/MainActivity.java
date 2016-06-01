@@ -7,10 +7,19 @@ import android.widget.Toast;
 import java.util.Random;
 
 import ru.noties.debug.Debug;
+import ru.noties.debug.apt.annotations.Label;
 import ru.noties.debug.timer.Timer;
 import ru.noties.debug.timer.TimerType;
 
 public class MainActivity extends AppCompatActivity {
+
+    @Label("debug")
+    private String mText;
+
+    @Label("debug")
+    public MainActivity(String text) {
+        this.mText = text;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
 
         someMethodWithException();
 
-        simpleMethod();
+        tracking: simpleMethod();
 
         methodWithTimer();
 
@@ -58,6 +67,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @Label("tracking")
     private void simpleMethod() {
         Debug.w();
     }
@@ -110,22 +120,32 @@ public class MainActivity extends AppCompatActivity {
         Debug.w(1);
         Debug.e(1);
         Debug.wtf(1);
-
-        Debug.i(new Object(){public String toString(){ return "";}});
     }
 
     private void labels() {
 
         debug: {
-            Debug.i("this thing will be removed if `debug` label is set to be enabled, thus no message here");
+            Debug.i("this thing will be here if `debug` label is set to be enabled");
             Toast.makeText(this, "debug", Toast.LENGTH_SHORT).show();
         }
 
         tracking: {
             // do some tracking, actual only for `release` build
             Toast.makeText(this, "tracking", Toast.LENGTH_SHORT).show();
+            new TrackingClass();
         }
 
         tracking: Toast.makeText(this, "one liner is also ok", Toast.LENGTH_SHORT).show();
+
+        debug: {
+            Debug.i("text: %s", mText);
+        }
+    }
+
+    @Label("tracking")
+    private static class TrackingClass {
+        void doSomthing() {
+
+        }
     }
 }

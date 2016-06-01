@@ -54,6 +54,8 @@ public class DebugProcessor extends AbstractProcessor {
                     return false;
                 }
 
+                final long started = System.currentTimeMillis();
+
                 final TypeElement typeElement = (TypeElement) elements.iterator().next();
                 final DebugConfiguration debugConfiguration = typeElement.getAnnotation(DebugConfiguration.class);
 
@@ -78,6 +80,13 @@ public class DebugProcessor extends AbstractProcessor {
                         treeModifier.modify(removeLabels, root);
                     }
                 }
+
+                final long ended = System.currentTimeMillis();
+
+                mProcessingEnvironment.getMessager().printMessage(
+                        Diagnostic.Kind.NOTE,
+                        String.format("Debug-apt, processing took: %d ms", (ended - started))
+                );
             }
         }
 
