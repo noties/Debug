@@ -27,10 +27,6 @@ public class FileDebugOutput implements DebugOutput {
         public UnableToObtainFileException(String detailMessage, Throwable throwable) {
             super(detailMessage, throwable);
         }
-
-        public UnableToObtainFileException(Throwable throwable) {
-            super(throwable);
-        }
     }
 
     public interface FileStrategy {

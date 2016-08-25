@@ -14,20 +14,7 @@ import ru.noties.debug.timer.TimerType;
 
 public class Debug {
 
-    private static volatile Debug sInstance = null;
-
-    private static Debug getInstance() {
-        Debug local = sInstance;
-        if (local == null) {
-            synchronized (Debug.class) {
-                local = sInstance;
-                if (local == null) {
-                    local = sInstance = new Debug();
-                }
-            }
-        }
-        return local;
-    }
+    private static final Debug INSTANCE = new Debug();
 
     private static final String FILE_NAME = "Debug.java";
 
@@ -41,23 +28,13 @@ public class Debug {
     }
 
     public static void init(DebugOutput debugOutput, DebugRender debugRender) {
-        final Debug debug = Debug.getInstance();
-        debug.output = debugOutput;
-        debug.render = debugRender;
-    }
-
-    public void setOutput(DebugOutput output) {
-        this.output = output;
-    }
-
-    public void setRender(DebugRender render) {
-        this.render = render;
+        INSTANCE.output = debugOutput;
+        INSTANCE.render = debugRender;
     }
     
     public static boolean isDebug() {
-        final Debug debug = Debug.getInstance();
-        final DebugOutput output = debug.output;
-        final DebugRender render = debug.render;
+        final DebugOutput output = INSTANCE.output;
+        final DebugRender render = INSTANCE.render;
         return (output != null && render != null)
                 && output.isDebug();
     }
@@ -119,7 +96,7 @@ public class Debug {
             return;
         }
 
-        final Debug debug = Debug.getInstance();
+        final Debug debug = INSTANCE;
         final LogItem logItem = debug.render.timer(elements[0], timer.getName(), timer.getTimerType(), timerItems);
         if (logItem != null) {
             debug.output.log(level, null, logItem.tag, logItem.message);
@@ -239,7 +216,7 @@ public class Debug {
             return;
         }
 
-        final Debug debug = Debug.getInstance();
+        final Debug debug = INSTANCE;
 
         final LogItem logItem = debug.render.log(elements[0], message, args);
         if (logItem != null) {
@@ -272,7 +249,7 @@ public class Debug {
             return;
         }
 
-        final Debug debug = Debug.getInstance();
+        final Debug debug = INSTANCE;
 
         final LogItem logItem = debug.render.trace(obtainStackTrace(), maxItems);
         if (logItem != null) {
