@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="log_button_text">logcat</string>
-    <string name="debug_tag_filter_hint">Tag</string>
-</resources>

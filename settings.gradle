@@ -1,2 +1,1 @@
-include ':sample', ':library-ui', ':apt-compiler', ':apt-annotations', ':library-test'
-include 'lib'
+include ':sample', ':library-remove-compiler', ':library'

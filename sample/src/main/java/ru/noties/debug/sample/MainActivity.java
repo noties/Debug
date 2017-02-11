@@ -7,24 +7,22 @@ import android.widget.Toast;
 import java.util.Random;
 
 import ru.noties.debug.Debug;
-import ru.noties.debug.apt.annotations.Label;
+import ru.noties.debug.DebugRemove;
 import ru.noties.debug.timer.Timer;
 import ru.noties.debug.timer.TimerType;
 
+@DebugRemove
 public class MainActivity extends AppCompatActivity {
 
-    @Label("debug")
-    private String mText;
-
-    @Label("debug")
-    public MainActivity(String text) {
-        this.mText = text;
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        "".regionMatches(false, 2, "", 0, 2);
+
+        Debug.i("onCreate here!");
 
         if (savedInstanceState == null) {
             getSupportFragmentManager()
@@ -55,8 +53,11 @@ public class MainActivity extends AppCompatActivity {
         labels();
     }
 
+
     private void someMethod(int x, int x2, String y) {
-        Debug.i("x: %d, x2: %d, y: %s", x, x2, y);
+//        Debug.i("x: %d, x2: %d, y: %s", x, x2, y);
+        ru.noties.debug.Debug.i("hello from Debug.i()");
+
     }
 
     private void someMethodWithException() {
@@ -67,7 +68,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    @Label("tracking")
     private void simpleMethod() {
         Debug.w();
     }
@@ -103,6 +103,8 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
 
+
+
                 timer.stop();
                 Debug.i(timer);
             }
@@ -129,23 +131,18 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(this, "debug", Toast.LENGTH_SHORT).show();
         }
 
+
+        // hhh
+        //noinspection UnusedLabel
         tracking: {
             // do some tracking, actual only for `release` build
             Toast.makeText(this, "tracking", Toast.LENGTH_SHORT).show();
-            new TrackingClass();
         }
 
         tracking: Toast.makeText(this, "one liner is also ok", Toast.LENGTH_SHORT).show();
 
-        debug: {
-            Debug.i("text: %s", mText);
-        }
-    }
-
-    @Label("tracking")
-    private static class TrackingClass {
-        void doSomthing() {
-
+        $: {
+            Debug.i("text: %s", "some text");
         }
     }
 }

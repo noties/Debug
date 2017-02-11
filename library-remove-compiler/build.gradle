@@ -1,0 +1,24 @@
+import org.gradle.internal.jvm.Jvm
+
+apply plugin: 'java'
+apply from: '../common-java-publishing-maven.gradle'
+
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
+
+version = VERSION_NAME
+group = GROUP
+
+sourceSets {
+    main {
+        java.srcDirs += SRC_ANNOTATIONS
+    }
+}
+
+dependencies {
+    compile files(Jvm.current().getToolsJar())
+}
+
+if (project.hasProperty('release')) {
+    apply from: '../common-java-publishing-maven.gradle'
+}
