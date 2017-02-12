@@ -47,7 +47,7 @@ Added a concept of `DebugOutput`. Now different *out* policies can be configured
 * `UncaughtExceptionDebugOutput` - logging of uncaught exceptions (which would be passed to `Debug.e()`)
 * `DebugOutputFacade` - to wrap more than one `DebugOutput`
 
-Of cause, you could easily create your own output - just implement `ru.noties.debug.out.DebugOutput` and pass it to `Debug` while initialization.
+Of cause, you could easily create your own output - just implement `ru.noties.debug.DebugOutput` and pass it to `Debug` while initialization.
 
 
 ### How to do it

@@ -1,8 +1,6 @@
 package ru.noties.debug.out;
 
-/**
- * Created by Dimitry Ivanov on 25.06.2015.
- */
+@Deprecated
 public class OutputUtils {
 
     private OutputUtils() {}

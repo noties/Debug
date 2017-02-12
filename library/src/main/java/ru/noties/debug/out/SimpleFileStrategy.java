@@ -4,9 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Date;
 
-/**
- * Created by Dimitry Ivanov on 25.06.2015.
- */
+@Deprecated
 public class SimpleFileStrategy implements FileDebugOutput.FileStrategy {
 
     public static class InitializationException extends Exception {

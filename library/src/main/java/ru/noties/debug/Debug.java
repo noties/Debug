@@ -1,306 +1,345 @@
 package ru.noties.debug;
 
-import java.util.List;
-
-import ru.noties.debug.out.DebugOutput;
-import ru.noties.debug.render.DebugRender;
-import ru.noties.debug.render.DebugRenderBase;
-import ru.noties.debug.render.LogItem;
-import ru.noties.debug.timer.EmptyTimer;
-import ru.noties.debug.timer.SimpleTimer;
-import ru.noties.debug.timer.Timer;
-import ru.noties.debug.timer.TimerItem;
-import ru.noties.debug.timer.TimerType;
+import java.util.Collection;
+import java.util.Locale;
+import java.util.regex.Pattern;
 
 public class Debug {
 
     private static final Debug INSTANCE = new Debug();
+    private static final Pattern STRING_FORMAT_PATTERN = Pattern.compile("%(\\d+\\$)?([-#+ 0,(<]*)?(\\d+)?(\\.\\d+)?([tT])?([a-zA-Z%])");
 
     private static final String FILE_NAME = "Debug.java";
+    private static final String STARTING_MESSAGE_PATTERN_LINK = "%1$s(%2$s:%3$d)";
+    private static final String TRACE_FIRST_LINE = "trace:\n";
 
     private DebugOutput output;
-    private DebugRender render;
-    
+
     private Debug() {}
-    
-    public static void init(DebugOutput debugOutput) {
-        Debug.init(debugOutput, new DebugRenderBase());
+
+
+    // can be empty, but there will be no logging
+    public static void init(DebugOutput... outputs) {
+
+        final DebugOutput out;
+        final int length = outputs != null
+                ? outputs.length
+                : 0;
+
+        if (length == 0) {
+            out = null;
+        } else {
+            if (length == 1) {
+                out = outputs[0];
+            } else {
+                out = new DebugOutputContainer(outputs);
+            }
+        }
+
+        INSTANCE.output = out;
     }
 
-    public static void init(DebugOutput debugOutput, DebugRender debugRender) {
-        INSTANCE.output = debugOutput;
-        INSTANCE.render = debugRender;
+    public static void init(Collection<? extends DebugOutput> outputs) {
+
+        final DebugOutput out;
+
+        final int length = outputs != null
+                ? outputs.size()
+                : 0;
+
+        if (length == 0) {
+            out = null;
+        } else {
+            if (length == 1) {
+                out = outputs.iterator().next();
+            } else {
+                final DebugOutput[] debugOutputs = new DebugOutput[length];
+                outputs.toArray(debugOutputs);
+                out = new DebugOutputContainer(debugOutputs);
+            }
+        }
+
+        INSTANCE.output = out;
     }
-    
+
     public static boolean isDebug() {
         final DebugOutput output = INSTANCE.output;
-        final DebugRender render = INSTANCE.render;
-        return (output != null && render != null)
-                && output.isDebug();
+        return output != null && output.isDebug();
     }
 
 
-    // Timer methods
-
-    public static Timer newTimer(String name, TimerType type) {
-        if (!isDebug()) {
-            return new EmptyTimer();
-        }
-        return SimpleTimer.newInstance(name, type);
+    public static void v(Throwable throwable, Object... args) {
+        log(Level.V, throwable, args);
     }
 
-    public static Timer newTimer(String name) {
-        if (!isDebug()) {
-            return new EmptyTimer();
-        }
-        return SimpleTimer.newInstance(name);
+    public static void v(Object... args) {
+        log(Level.V, null, args);
     }
 
-    public static void v(Timer timer) {
-        logTimer(Level.V, timer);
+
+    public static void d(Throwable throwable, Object... args) {
+        log(Level.D, throwable, args);
     }
 
-    public static void d(Timer timer) {
-        logTimer(Level.D, timer);
+    public static void d(Object... args) {
+        log(Level.D, null, args);
     }
 
-    public static void i(Timer timer) {
-        logTimer(Level.I, timer);
+
+    public static void i(Throwable throwable, Object... args) {
+        log(Level.I, throwable, args);
     }
 
-    public static void w(Timer timer) {
-        logTimer(Level.W, timer);
+    public static void i(Object... args) {
+        log(Level.I, null, args);
     }
 
-    public static void e(Timer timer) {
-        logTimer(Level.E, timer);
+
+    public static void w(Throwable throwable, Object... args) {
+        log(Level.W, throwable, args);
     }
 
-    public static void wtf(Timer timer) {
-        logTimer(Level.WTF, timer);
+    public static void w(Object... args) {
+        log(Level.W, null, args);
     }
 
-    private static void logTimer(Level level, Timer timer) {
-        if (!isDebug()) {
-            return;
-        }
 
-        final List<TimerItem> timerItems = timer.getItems();
-        if (timerItems == null) {
-            return;
-        }
-
-        final StackTraceElement[] elements = obtainStackTrace();
-        if (elements == null
-                || elements.length == 0) {
-            return;
-        }
-
-        final Debug debug = INSTANCE;
-        final LogItem logItem = debug.render.timer(elements[0], timer.getName(), timer.getTimerType(), timerItems);
-        if (logItem != null) {
-            debug.output.log(level, null, logItem.tag, logItem.message);
-        }
+    public static void e(Throwable throwable, Object... args) {
+        log(Level.E, throwable, args);
     }
 
-    public static void e(Throwable throwable, String message, Object... args) {
-        log(Level.E, throwable, message, args);
+    public static void e(Object... args) {
+        log(Level.E, null, args);
     }
 
-    public static void e(String message,  Object... args) {
-        log(Level.E, null, message, args);
+
+    public static void wtf(Throwable throwable, Object... args) {
+        log(Level.WTF, throwable, args);
     }
 
-    public static void e() {
-        log(Level.E, null, null);
+    public static void wtf(Object... args) {
+        log(Level.WTF, null, args);
     }
 
-    public static void e(Throwable throwable) {
-        log(Level.E, throwable, null);
-    }
-
-    public static void e(Object o) {
-        log(Level.E, null, String.valueOf(o));
-    }
-
-    public static void w(Throwable throwable, String message, Object... args) {
-        log(Level.W, throwable, message, args);
-    }
-
-    public static void w(String message, Object... args) {
-        log(Level.W, null, message, args);
-    }
-
-    public static void w() {
-        log(Level.W, null, null);
-    }
-
-    public static void w(Object o) {
-        log(Level.W, null, String.valueOf(o));
-    }
-
-    public static void i(Throwable throwable, String message, Object... args) {
-        log(Level.I, throwable, message, args);
-    }
-
-    public static void i(String message, Object... args) {
-        log(Level.I, null, message, args);
-    }
-
-    public static void i() {
-        log(Level.I, null, null);
-    }
-
-    public static void i(Object o) {
-        log(Level.I, null, String.valueOf(o));
-    }
-
-    public static void d(Throwable throwable, String message, Object... args) {
-        log(Level.D, throwable, message, args);
-    }
-
-    public static void d(String message, Object... args) {
-        log(Level.D, null, message, args);
-    }
-
-    public static void d() {
-        log(Level.D, null, null);
-    }
-
-    public static void d(Object o) {
-        log(Level.D, null, String.valueOf(o));
-    }
-
-    public static void v(Throwable throwable, String message, Object... args) {
-        log(Level.V, throwable, message, args);
-    }
-
-    public static void v(String message, Object... args) {
-        log(Level.V, null, message, args);
-    }
-
-    public static void v() {
-        log(Level.V, null, null);
-    }
-
-    public static void v(Object o) {
-        log(Level.V, null, String.valueOf(o));
-    }
-
-    public static void wtf() {
-        log(Level.WTF, null, null);
-    }
-
-    public static void wtf(String message, Object... args) {
-        log(Level.WTF, null, message, args);
-    }
-
-    public static void wtf(Throwable throwable, String message, Object... args) {
-        log(Level.WTF, throwable, message, args);
-    }
-
-    public static void wtf(Object o) {
-        log(Level.WTF, null, String.valueOf(o));
-    }
-
-    static void log(Level level, Throwable throwable, String message, Object... args) {
-
-        if (!isDebug()) {
-            return;
-        }
-
-        final StackTraceElement[] elements = obtainStackTrace();
-        if (elements == null
-                || elements.length == 0) {
-            // todo maybe additional logging?
-            return;
-        }
-
-        final Debug debug = INSTANCE;
-
-        final LogItem logItem = debug.render.log(elements[0], message, args);
-        if (logItem != null) {
-            debug.output.log(level, throwable, logItem.tag, logItem.message);
-        }
-    }
 
     public static void trace() {
-        trace(Level.V, -1);
+        trace(Level.V, 0);
     }
 
     public static void trace(Level level) {
-        trace(level, -1);
+        trace(level, 0);
     }
 
     public static void trace(int maxItems) {
         trace(Level.V, maxItems);
     }
 
+    @SuppressWarnings("WeakerAccess")
     public static void trace(Level level, int maxItems) {
 
-        if (!isDebug()) {
+        final DebugOutput output = INSTANCE.output;
+        if (output == null
+                || !output.isDebug()) {
             return;
         }
+
+        final String tag;
+        final String message;
 
         final StackTraceElement[] elements = obtainStackTrace();
         if (elements == null
                 || elements.length == 0) {
-            // todo maybe additional logging?
+            tag = null;
+            message = null;
+        } else {
+            tag = callerTag(elements[0]);
+            message = traceLogMessage(elements, maxItems);
+        }
+
+        output.log(level, null, tag, message);
+    }
+
+
+    private static void log(Level level, Throwable throwable, Object[] args) {
+
+        final DebugOutput output = INSTANCE.output;
+        if (output == null
+                || !output.isDebug()) {
             return;
         }
 
-        final Debug debug = INSTANCE;
-
-        final LogItem logItem = debug.render.trace(obtainStackTrace(), maxItems);
-        if (logItem != null) {
-            debug.output.log(level, null, logItem.tag, logItem.message);
-        }
+        output.log(level, throwable, callerTag(), logMessage(args));
     }
 
-    public static String getLogMessage(String message, Object[] args) {
-        if (message == null) {
-            return null;
+    // can be null
+    private static String callerTag() {
+
+        final String out;
+
+        final StackTraceElement[] elements = new Throwable().getStackTrace();
+        final int length = elements != null
+                ? elements.length
+                : 0;
+
+        if (length == 0) {
+            out = null;
+        } else {
+
+            String elementName;
+            int first = -1;
+
+            for (int i = 0; i < length; i++) {
+
+                elementName = elements[i].getFileName();
+                if (FILE_NAME.equals(elementName)) {
+                    continue;
+                }
+
+                first = i;
+                break;
+            }
+
+            if (first > -1) {
+                out = callerTag(elements[first]);
+            } else {
+                out = null;
+            }
         }
 
-        if (args == null || args.length == 0) {
-            return message;
+        return out;
+    }
+
+    private static String callerTag(StackTraceElement element) {
+        return String.format(
+                Locale.US,
+                STARTING_MESSAGE_PATTERN_LINK,
+                element.getMethodName(),
+                element.getFileName(),
+                element.getLineNumber()
+        );
+    }
+
+    private static String logMessage(Object[] args) {
+
+        final String out;
+
+        final int length = args != null
+                ? args.length
+                : 0;
+
+        if (length == 0) {
+            // nothing here
+            out = null;
+        } else {
+            if (length == 1) {
+                // we could insert here an array check, but... it just clutters the code
+                // plus we will need to insert a lot of checks for multidimensional array etc.
+                // Plus, it's weird that we will do this kind of check only for the first element
+                // anyways calling `Arrays.toString` is way better (as caller knows the type of an array at least)
+                out = String.valueOf(args[0]);
+            } else {
+
+                // if first argument is String -> check if it's a String.format pattern
+                // if not, do treat first String argument just as simple Object
+
+                Object first = args[0];
+                if (first != null
+                        && String.class.equals(first.getClass())) {
+
+                    final String pattern = (String) first;
+                    if (STRING_FORMAT_PATTERN.matcher(pattern).find()) {
+                        final Object[] formatArgs = new Object[length - 1];
+                        System.arraycopy(args, 1, formatArgs, 0, length - 1);
+                        out = String.format(pattern, formatArgs);
+                    } else {
+                        out = concat(args);
+                    }
+                } else {
+                    out = concat(args);
+                }
+            }
         }
 
-        return String.format(message, args);
+        return out;
+    }
+
+    private static String concat(Object[] args) {
+        final StringBuilder builder = new StringBuilder();
+        for (int i = 0, length = args.length; i < length; i++) {
+            if (i != 0) {
+                builder.append(", ");
+            }
+            builder.append(args[i]);
+        }
+        return builder.toString();
     }
 
     private static StackTraceElement[] obtainStackTrace() {
 
+        final StackTraceElement[] out;
+
         final StackTraceElement[] elements = new Throwable().getStackTrace();
-        final int length = elements != null ? elements.length : 0;
+        final int length = elements != null
+                ? elements.length
+                : 0;
 
         if (length == 0) {
-            return null;
-        }
+            out = null;
+        } else {
 
-        final String debugFileName = FILE_NAME;
+            String elementName;
+            int start = -1;
 
-        String elementName;
-        int start = -1;
+            for (int i = 0; i < length; i++) {
 
-        for (int i = 0; i < length; i++) {
+                elementName = elements[i].getFileName();
+                if (FILE_NAME.equals(elementName)) {
+                    continue;
+                }
 
-            elementName = elements[i].getFileName();
-            if (debugFileName.equals(elementName)) {
-                continue;
+                start = i;
+                break;
             }
 
-            start = i;
-            break;
+            if (start > -1) {
+                final int newLength = length - start;
+                out = new StackTraceElement[newLength];
+                System.arraycopy(elements, start, out, 0, newLength);
+            } else {
+                // whatever we have
+                out = elements;
+            }
         }
 
-        if (start > 0) {
-            final int newLength = length - start;
-            final StackTraceElement[] out = new StackTraceElement[newLength];
-            System.arraycopy(elements, start, out, 0, newLength);
-            return out;
+        return out;
+    }
+
+    private static String traceLogMessage(StackTraceElement[] elements, int maxItems) {
+
+        final StringBuilder builder = new StringBuilder(TRACE_FIRST_LINE);
+
+        String fileName;
+        String callerTag = null;
+
+        int items = 0;
+
+        for (StackTraceElement element: elements) {
+
+            fileName = element.getFileName();
+
+            if (callerTag == null) {
+                callerTag = fileName;
+            }
+
+            if (maxItems > 0 && ++items > maxItems) {
+                break;
+            }
+
+            builder.append("\tat ")
+                    .append(element.toString())
+                    .append('\n');
         }
 
-        return elements;
+        return builder.toString();
     }
 }

@@ -11,11 +11,10 @@ import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import ru.noties.debug.DebugOutput;
 import ru.noties.debug.Level;
 
-/**
- * Created by Dimitry Ivanov on 25.06.2015.
- */
+@Deprecated
 public class FileDebugOutput implements DebugOutput {
 
     public static class UnableToObtainFileException extends Exception {

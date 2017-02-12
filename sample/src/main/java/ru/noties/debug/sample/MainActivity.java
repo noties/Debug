@@ -4,14 +4,11 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
 
-import java.util.Random;
+import java.net.UnknownHostException;
+import java.util.Arrays;
 
 import ru.noties.debug.Debug;
-import ru.noties.debug.DebugRemove;
-import ru.noties.debug.timer.Timer;
-import ru.noties.debug.timer.TimerType;
 
-@DebugRemove
 public class MainActivity extends AppCompatActivity {
 
 
@@ -20,9 +17,24 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        "".regionMatches(false, 2, "", 0, 2);
+        // todo, NOTICE that if enumeration of arguments is passed to the method
+        // and first one is String -> there will be an exception, because Debug will try to call
+        // String.format(args[0], args[1:-1]), so in order to skip internal String.format call pa
+
+        // so, the idea is this -> if first argument is String -> try to String.format
+        // if fails -> just enumerate, if success - it's it
+
 
         Debug.i("onCreate here!");
+        Debug.i(1, 2, 3, 4, 5);
+        Debug.i("0", "1", "2", "3"); // will just enumerate strings
+        Debug.i("%s %s %s", null, null, null); // will call String.format
+        Debug.i(1, 2, 3, 4);
+
+        // todo, `hello from a for loop` is not removed
+        for (int i = 0; i < 10; i++, Debug.i("hello from a for loop")) {
+            Debug.i("body of a for loop");
+        }
 
         if (savedInstanceState == null) {
             getSupportFragmentManager()
@@ -40,19 +52,29 @@ public class MainActivity extends AppCompatActivity {
 
         tracking: simpleMethod();
 
-        methodWithTimer();
-
         Debug.e("ok");
-
-        methodWithTimerNano();
 
         throwException();
 
         objectPrint();
 
         labels();
-    }
 
+        Debug.e(new UnknownHostException());
+
+        final UnknownHostException exception = new UnknownHostException();
+        exception.initCause(new Throwable(new RuntimeException(new IllegalStateException())));
+        Debug.e(exception, "Hello this is a message for exception");
+
+        final String bigOne;
+        {
+            final int length = 8001;
+            final char[] chars = new char[length];
+            Arrays.fill(chars, 'c');
+            bigOne = new String(chars);
+            Debug.i(bigOne);
+        }
+    }
 
     private void someMethod(int x, int x2, String y) {
 //        Debug.i("x: %d, x2: %d, y: %s", x, x2, y);
@@ -70,45 +92,6 @@ public class MainActivity extends AppCompatActivity {
 
     private void simpleMethod() {
         Debug.w();
-    }
-
-    private void methodWithTimer() {
-        doTiming(Debug.newTimer("Timer #1"));
-    }
-
-    private void methodWithTimerNano() {
-        doTiming(Debug.newTimer("Timer Nano #2", TimerType.NANO));
-    }
-
-    private void doTiming(final Timer timer) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-
-                final Random random = new Random();
-                timer.start("here we go, someVar: %d", 10);
-
-                for (int i = 0; i < 22; i++) {
-                    if ((i & 1) == 0) {
-                        timer.tick();
-                    } else {
-                        timer.tick("i: %d", i);
-                    }
-
-                    // Dont do it. Ever
-                    try {
-                        Thread.sleep(random.nextInt(100));
-                    } catch (InterruptedException e) {
-                        Debug.e(e);
-                    }
-                }
-
-
-
-                timer.stop();
-                Debug.i(timer);
-            }
-        }).start();
     }
 
     private void throwException() {
