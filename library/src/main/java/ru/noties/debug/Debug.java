@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Locale;
 import java.util.regex.Pattern;
 
+@SuppressWarnings("WeakerAccess")
 public class Debug {
 
     private static final Debug INSTANCE = new Debug();
@@ -134,7 +135,6 @@ public class Debug {
         trace(Level.V, maxItems);
     }
 
-    @SuppressWarnings("WeakerAccess")
     public static void trace(Level level, int maxItems) {
 
         final DebugOutput output = INSTANCE.output;

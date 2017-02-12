@@ -1,5 +1,6 @@
 package ru.noties.debug;
 
+@SuppressWarnings("WeakerAccess")
 public class DebugOutputContainer implements DebugOutput {
 
     private final DebugOutput[] outputs;
@@ -13,7 +14,7 @@ public class DebugOutputContainer implements DebugOutput {
     @Override
     public void log(Level level, Throwable throwable, String tag, String message) {
         for (DebugOutput output: outputs) {
-            if (output != null) {
+            if (output != null && output.isDebug()) {
                 output.log(level, throwable, tag, message);
             }
         }

@@ -31,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
         Debug.i("%s %s %s", null, null, null); // will call String.format
         Debug.i(1, 2, 3, 4);
 
-        // todo, `hello from a for loop` is not removed
+        // todo, `hello from a for loop` is not removed, must say it specifically...who would use something like that?
         for (int i = 0; i < 10; i++, Debug.i("hello from a for loop")) {
             Debug.i("body of a for loop");
         }

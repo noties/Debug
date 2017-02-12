@@ -32,7 +32,7 @@ version = VERSION_NAME
 group = GROUP
 
 dependencies {
-
+    testCompile "junit:junit:${JUNIT_VERSION}"
 }
 
 if (project.hasProperty('release')) {
