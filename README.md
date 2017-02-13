@@ -11,12 +11,14 @@ Fast, easy and poweful logging utility for Android and Java.
 * Processor to actually **remove** all logging calls (not suppress, but modify Java AST to remove all calls from source code)
 
 
+All links are clickable and clicking on them will navigate to the referenced method in an IDE:
 ![output_1](pics/debug_calls.png)
+
 
 ![output_2](pics/debug_exception_stack_trace.png)
 
-// All links are clickable and clicking on them will navigate to the referenced method in an IDE
 
+Quick peek on live templates:
 ![live_template](pics/debug_live_template.gif)
 
 
@@ -30,6 +32,7 @@ compile 'ru.noties:debug:3.0.0@jar'
 annotationProcessor 'ru.noties:debug-remove:3.0.0'
 ```
 
+
 To start using this library it must be initialized with desired output:
 ```java
 Debug.init(new AndroidLogDebugOutput(/*isDebug*/true)); // BuildConfig.DEBUG can be used
@@ -42,6 +45,7 @@ final List<DebugOutput> outputs = /*obtain desired outputs)*/;
 Debug.init(outputs);
 ```
 
+
 In order to use processor, that removes all `Debug.*` calls you must annotate any class in your project with `@ru.noties.debug.DebugRemove` (Your application class is a wise choice):
 ```java
 @DebugRemove
@@ -53,6 +57,7 @@ public class MyApplication extends android.app.Application {}
 @DebugRemove(true); // default value is `true`, so `@DebugRemove` can be used
 @DebugRemove(false);
 ```
+
 
 Unfortunatelly one cannot use `BuildConfig.DEBUG` value as it's not a compile time constant (`Boolean.parseBoolean("true");`). In case of Android one can add this simple property to each buildType:
 ```gradle
@@ -72,6 +77,7 @@ android {
     }
 }
 ```
+
 
 And then can be used:
 ```java
@@ -94,7 +100,9 @@ If proguard is used this configuration can be used to remove all the log calls (
 }
 ```
 
+
 ## Usage
+### Logs
 Debug has all the default Android log levels: **VERBOSE**, **DEBUG**, **INFO**, **WARN**, **ERROR**, **WTF**. Each level has corresponding Debug method:
 ```java
 Debug.v();
@@ -127,6 +135,17 @@ Else all arguments will be concatted into one string:
 ```java
 Debug.i("first", 2, true, "forth", null); // -> "first, 2, true, forth, null"
 ```
+
+
+### Trace
+Will print method chain calls that triggered with log call
+```java
+Debug.trace();
+Debug.trace(int maxStack);
+Debug.trace(Level level);
+Debug.trace(Level level, int maxStack);
+```
+
 
 ## Live templates (IDEA)
 There is a file with basic templates: [templates_ru_noties_debug.xml](templates_ru_noties_debug.xml).
