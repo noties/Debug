@@ -12,6 +12,7 @@ Fast, easy and poweful logging utility for Android and Java.
 
 
 All links are clickable and clicking on them will navigate to the referenced method in an IDE:
+
 ![output_1](pics/debug_calls.png)
 
 
@@ -19,6 +20,7 @@ All links are clickable and clicking on them will navigate to the referenced met
 
 
 Quick peek on live templates:
+
 ![live_template](pics/debug_live_template.gif)
 
 
