@@ -24,6 +24,19 @@ public class MainActivity extends AppCompatActivity {
         // so, the idea is this -> if first argument is String -> try to String.format
         // if fails -> just enumerate, if success - it's it
 
+        Debug.i();
+        Debug.v();
+        Debug.d();
+        Debug.e();
+        Debug.d();
+        Debug.w();
+
+        Debug.i("savedInstanceState: %s", savedInstanceState);
+        Debug.v("savedInstanceState: %s", savedInstanceState);
+        Debug.d("savedInstanceState: %s", savedInstanceState);
+        Debug.e("savedInstanceState: %s", savedInstanceState);
+        Debug.d("savedInstanceState: %s", savedInstanceState);
+        Debug.w("savedInstanceState: %s", savedInstanceState);
 
         Debug.i("onCreate here!");
         Debug.i(1, 2, 3, 4, 5);
