@@ -6,7 +6,7 @@ import ru.noties.debug.Level;
 
 public class DebugCalls {
 
-    private static final int CALLS = 16;
+    private static final int CALLS = 17;
     private static final int BLOCK_CALLS = 4;
 
     static final int TOTAL_CALLS = CALLS + BLOCK_CALLS;
@@ -31,6 +31,7 @@ public class DebugCalls {
         labeledBlock();
         loops();
         condition();
+        traceCall();
     }
 
     private static void staticCall() {
@@ -113,6 +114,10 @@ public class DebugCalls {
         } else {
             ;
         }
+    }
+
+    private void traceCall() {
+        Debug.trace();
     }
 
     private static class DebugOutputCounter implements DebugOutput {
