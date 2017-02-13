@@ -28,5 +28,5 @@ ext {
 
     // SUPPORT_VERSION = '25.1.1'
     JUNIT_VERSION = '4.12'
-    //ROBOLECTRIC_VERSION = '3.0.0'
+    ROBOLECTRIC_VERSION = '3.2.2'
 }
