@@ -6,6 +6,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+@SuppressWarnings("WeakerAccess")
 public class SystemOutDebugOutput implements DebugOutput {
 
     private final boolean mIsDebug;

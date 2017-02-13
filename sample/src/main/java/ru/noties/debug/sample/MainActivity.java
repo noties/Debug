@@ -2,10 +2,8 @@ package ru.noties.debug.sample;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.widget.Toast;
 
 import java.net.UnknownHostException;
-import java.util.Arrays;
 
 import ru.noties.debug.Debug;
 
@@ -24,30 +22,17 @@ public class MainActivity extends AppCompatActivity {
         // so, the idea is this -> if first argument is String -> try to String.format
         // if fails -> just enumerate, if success - it's it
 
-        Debug.i();
-        Debug.v();
-        Debug.d();
-        Debug.e();
-        Debug.d();
-        Debug.w();
-
-        Debug.i("savedInstanceState: %s", savedInstanceState);
-        Debug.v("savedInstanceState: %s", savedInstanceState);
-        Debug.d("savedInstanceState: %s", savedInstanceState);
-        Debug.e("savedInstanceState: %s", savedInstanceState);
-        Debug.d("savedInstanceState: %s", savedInstanceState);
-        Debug.w("savedInstanceState: %s", savedInstanceState);
-
-        Debug.i("onCreate here!");
-        Debug.i(1, 2, 3, 4, 5);
+        Debug.v("onCreate here!");
+        Debug.d(1, 2, 3, 4, 5);
         Debug.i("0", "1", "2", "3"); // will just enumerate strings
-        Debug.i("%s %s %s", null, null, null); // will call String.format
-        Debug.i(1, 2, 3, 4);
+        Debug.w("%s %s %s", null, null, null); // will call String.format
+        Debug.e(true, null, Integer.MAX_VALUE, Long.MIN_VALUE);
+        Debug.wtf("No, really, WTF?!");
 
-        // todo, `hello from a for loop` is not removed, must say it specifically...who would use something like that?
-        for (int i = 0; i < 10; i++, Debug.i("hello from a for loop")) {
-            Debug.i("body of a for loop");
-        }
+//        // todo, `hello from a for loop` is not removed, must say it specifically...who would use something like that?
+//        for (int i = 0; i < 10; i++, Debug.i("hello from a for loop")) {
+//            Debug.i("body of a for loop");
+//        }
 
         if (savedInstanceState == null) {
             getSupportFragmentManager()
@@ -59,41 +44,41 @@ public class MainActivity extends AppCompatActivity {
         // Trace current method calls chain
         Debug.trace(100);
 
-        someMethod(1, 5, "Hello!");
+//        someMethod(1, 5, "Hello!");
 
-        someMethodWithException();
+//        someMethodWithException();
 
-        tracking: simpleMethod();
+//        tracking: simpleMethod();
 
-        Debug.e("ok");
+//        Debug.e("ok");
 
-        throwException();
+//        throwException();
 
-        objectPrint();
+//        objectPrint();
 
-        labels();
+//        labels();
 
-        Debug.e(new UnknownHostException());
+//        Debug.e(new UnknownHostException());
 
         final UnknownHostException exception = new UnknownHostException();
-        exception.initCause(new Throwable(new RuntimeException(new IllegalStateException())));
+        exception.initCause(new Throwable());
         Debug.e(exception, "Hello this is a message for exception");
-
-        final String bigOne;
-        {
-            final int length = 8001;
-            final char[] chars = new char[length];
-            Arrays.fill(chars, 'c');
-            bigOne = new String(chars);
-            Debug.i(bigOne);
-        }
+//
+//        final String bigOne;
+//        {
+//            final int length = 8001;
+//            final char[] chars = new char[length];
+//            Arrays.fill(chars, 'c');
+//            bigOne = new String(chars);
+//            Debug.i(bigOne);
+//        }
     }
-
-    private void someMethod(int x, int x2, String y) {
-//        Debug.i("x: %d, x2: %d, y: %s", x, x2, y);
-        ru.noties.debug.Debug.i("hello from Debug.i()");
-
-    }
+//
+//    private void someMethod(int x, int x2, String y) {
+////        Debug.i("x: %d, x2: %d, y: %s", x, x2, y);
+//        ru.noties.debug.Debug.i("hello from Debug.i()");
+//
+//    }
 
     private void someMethodWithException() {
         try {
@@ -103,42 +88,42 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void simpleMethod() {
-        Debug.w();
-    }
+//    private void simpleMethod() {
+//        Debug.w();
+//    }
 
-    private void throwException() {
-//        throw new IllegalStateException("Testing uncaught exception");
-    }
+//    private void throwException() {
+////        throw new IllegalStateException("Testing uncaught exception");
+//    }
+//
+//    private void objectPrint() {
+//        Debug.i(1);
+//        Debug.d(1);
+//        Debug.v(1);
+//        Debug.w(1);
+//        Debug.e(1);
+//        Debug.wtf(1);
+//    }
 
-    private void objectPrint() {
-        Debug.i(1);
-        Debug.d(1);
-        Debug.v(1);
-        Debug.w(1);
-        Debug.e(1);
-        Debug.wtf(1);
-    }
-
-    private void labels() {
-
-        debug: {
-            Debug.i("this thing will be here if `debug` label is set to be enabled");
-            Toast.makeText(this, "debug", Toast.LENGTH_SHORT).show();
-        }
-
-
-        // hhh
-        //noinspection UnusedLabel
-        tracking: {
-            // do some tracking, actual only for `release` build
-            Toast.makeText(this, "tracking", Toast.LENGTH_SHORT).show();
-        }
-
-        tracking: Toast.makeText(this, "one liner is also ok", Toast.LENGTH_SHORT).show();
-
-        $: {
-            Debug.i("text: %s", "some text");
-        }
-    }
+//    private void labels() {
+//
+//        debug: {
+//            Debug.i("this thing will be here if `debug` label is set to be enabled");
+//            Toast.makeText(this, "debug", Toast.LENGTH_SHORT).show();
+//        }
+//
+//
+//        // hhh
+//        //noinspection UnusedLabel
+//        tracking: {
+//            // do some tracking, actual only for `release` build
+//            Toast.makeText(this, "tracking", Toast.LENGTH_SHORT).show();
+//        }
+//
+//        tracking: Toast.makeText(this, "one liner is also ok", Toast.LENGTH_SHORT).show();
+//
+//        $: {
+//            Debug.i("text: %s", "some text");
+//        }
+//    }
 }

@@ -1,215 +1,101 @@
-## Debug - Android logging tool
-
+# Debug
 [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Debug-brightgreen.svg?style=flat)](https://android-arsenal.com/details/1/1038)
-
-### Why?
-* Lightweight
-* Simple
-* Powerful
-
-
-Debug library provides a lot of useful information. For ex., Java file name as a tag,
-method name and a line number where Debug function was called.
-Library provides the ability to jump to the source right from the logcat output.
-
-
-It has no impact on release code - no additional information will be collected at runtime (aka stacktrace).
-
-Note that if you are using this library in multi-process application, you must call `Debug.init(boolean)` for every process.
-
-
-Also, it wraps String.format(), so you can create any message with nearly any
-quantity of variables to check at almost no pain (and time).
-
-## Android Metaprogramming with `debug-compiler` & `debug-annotations`
-I've added a simple module to actually remove all the logging calls from the source code.
-I was not satisfied that all the logging was still present in release builds. Yes, the output was clean,
-but all the computations were there. For example:
-```java
-Debug.i("someValue1: %d, someValue2: %s, equals: %s", compute1(), compute2(), compute1().equals(compute2());
-```
-Will compute anyway all the values passed to the `i` call, but won't print them in release builds.
-Yes, logcat is clean, but we have computed these values, so we cannot say that this logging is completely harmless
-for application's performance. Please refer to the `README.md` in the `apt-compiler` module
-to get more information on how to achieve zero performance penalty for specific builds.
-
-
-## What's new (2.0.2)
-Added `jar` artifact for `lib` module.
-```gradle
-compile 'ru.noties:debug:2.0.2@jar'
-```
-
-### What's new (2.0.0)
-Added a concept of `DebugOutput`. Now different *out* policies can be configured. For example, if you wish to write debug logs not only to logcat, but also to a file or send to a server or whatever you wish to do with data, it now could be easily done. I bundled library with these outs (`ru.noties.debug.out`):
-* `AndroidLogDebugOutput` - simple logcat
-* `FileDebugOutput` - writing to a file
-* `UncaughtExceptionDebugOutput` - logging of uncaught exceptions (which would be passed to `Debug.e()`)
-* `DebugOutputFacade` - to wrap more than one `DebugOutput`
-
-Of cause, you could easily create your own output - just implement `ru.noties.debug.DebugOutput` and pass it to `Debug` while initialization.
-
-
-### How to do it
-
-```java
-Debug.i();
-Debug.v("My message");
-Debug.w("x: %d, y: %d, z: %s", 1, 72, .0F);
-Debug.d(new Throwable(), "mLastItemIndex: %d", mLastItemIndex);
-Debug.e(new Throwable());
-```
-
-### Installation
-
 [![Maven Central](https://img.shields.io/maven-central/v/ru.noties/debug.svg)](http://search.maven.org/#search|ga|1|g%3A%22ru.noties%22%20AND%20a%3A%22debug%22)
+[![Maven Central](https://img.shields.io/maven-central/v/ru.noties/debug-remove.svg)](http://search.maven.org/#search|ga|1|g%3A%22ru.noties%22%20AND%20a%3A%22debug-remove%22)
 
-Gradle:
-```groovy
-compile 'ru.noties:debug:x.x.x'
+Fast, easy and poweful logging utility for Android and Java.
+* Automatic tags based on Java class and method name, easy navigation to that call from IDE console output.
+* Build-in string formatting
+* Customizable outputs ready for extension (console, file, network, etc)
+* Easy method chain tracing (current method calls chain that triggered execution), navigatable from IDE console output
+* Processor to actually **remove** all logging calls (not suppress, but modify Java AST to remove all calls from source code)
+
+
+![output_1](pics/debug_calls.png)
+
+![output_2](pics/debug_exception_stack_trace.png)
+
+// All links are clickable and clicking on them will navigate to the referenced method in an IDE
+
+![live_template](pics/debug_live_template.gif)
+
+
+## Installation
+In your `dependencies` block in `build.gradle`:
+```gradle
+// the core library
+compile 'ru.noties:debug:3.0.0@jar'
+
+// annotation processor to remove all logging calls
+annotationProcessor 'ru.noties:debug-remove:3.0.0'
 ```
 
-The best place to initialise Debug library is an Application's onCreate() method.
-`Debug.init()` method takes one `DebugOutput` as a parameter.
-
+To start using this library it must be initialized with desired output:
 ```java
-public class DebugApplication extends Application {
+Debug.init(new AndroidLogDebugOutput(/*isDebug*/true)); // BuildConfig.DEBUG can be used
+```
+`Debug.init()` takes an array or a Collection of outputs.
+```java
+Debug.init(new AndroidLogDebugOutput(true), new SystemOutDebugOutput(true));
 
-    @Override
-    public void onCreate() {
-        super.onCreate();
+final List<DebugOutput> outputs = /*obtain desired outputs)*/;
+Debug.init(outputs);
+```
 
-        Debug.init(new AndroidLogDebugOutput(BuildConfig.DEBUG));
+In order to use processor, that removes all `Debug.*` calls you must annotate any class in your project with `@ru.noties.debug.DebugRemove` (Your application class is a wise choice):
+```java
+@DebugRemove
+public class MyApplication extends android.app.Application {}
+```
+
+`DebugRemove` takes optional boolean value that indicates if processor must actually modify source code
+```java
+@DebugRemove(true); // default value is `true`, so `@DebugRemove` can be used
+@DebugRemove(false);
+```
+
+Unfortunatelly one cannot use `BuildConfig.DEBUG` value as it's not a compile time constant (`Boolean.parseBoolean("true");`). In case of Android one can add this simple property to each buildType:
+```gradle
+android {
+
+    /* rest of the closure is omitted for brevity */
+
+    buildTypes {
+
+        release {
+            buildConfigField 'boolean', 'REMOVE_DEBUG_LOGS', 'true'
+        }
+
+        debug {
+            buildConfigField 'boolean', 'REMOVE_DEBUG_LOGS', 'false'
+        }
     }
 }
 ```
 
-If you wish to customize the output policy it could be easily done with `DebugOutputFacade`
-
+And then can be used:
 ```java
-final boolean isDebug = BuildConfig.DEBUG;
-final DebugOutputFacade output = DebugOutputFacade.newInstance(
-    new AndroidLogDebugOutput(isDebug),
-    new UncaughtExceptionDebugOutput(isDebug),
-    ...
-);
-Debug.init(output);
+@DebugRemove(BuildConfig.REMOVE_DEBUG_LOGS)
+public class MyApplication extends android.app.Application {}
 ```
 
-#### DebugOutput
-Common interface to configure Debug output
-```java
-public interface DebugOutput {
-    void log(Level level, Throwable throwable, String tag, String message);
-    boolean isDebug();
+
+If proguard is used this configuration can be used to remove all the log calls (instead of using processor):
+```proguard
+-assumenosideeffects class ru.noties.debug.Debug {
+    public static *** v(...);
+    public static *** d(...);
+    public static *** i(...);
+    public static *** w(...);
+    public static *** e(...);
+    public static *** wtf(...);
+    public static *** trace(...);
+    public static *** init(...);
 }
 ```
 
-#### UncaughtExceptionDebugOutput
-Logs uncaught exceptions (aka `Force close`) and passes it to `Debug.e()`
-
-#### FileDebugOutput
-Could be used to write Debug logs to a file. Should be obtained via static methods `newInstance`
-```java
-public static FileDebugOutput newInstance(
-        boolean isDebug,
-        boolean isAsync,
-        FileStrategy fileStrategy
-) throws UnableToObtainFileException { ... }
-```
-or
-```java
-public static FileDebugOutput newInstance(
-        boolean isDebug,
-        boolean isAsync,
-        FileStrategy fileStrategy,
-        OutputConverter outputConverter
-) throws UnableToObtainFileException { ... }
-```
-`isDebug` - indicates whether DebugOutput is active and should write logs
-
-`isAsync` - indicates whether writing should be done in a background thread (since it's IO)
-
-**FileStrategy**
-```java
-public interface FileStrategy {
-    File newSession() throws UnableToObtainFileException;
-}
-```
-If no major customization is needed `SimpleFileStrategy` could be used.
-```java
-public static SimpleFileStrategy newInstance(
-        File folder,
-        String logFolderName
-) throws InitializationException { ... }
-```
-or
-```java
-public static SimpleFileStrategy newInstance(
-        File folder,
-        String logFolderName,
-        LogFileNameStrategy logFileNameStrategy
-) throws InitializationException { ... }
-```
-
-**OutputConverter**
-
-Used to convert log message into String
-```java
-public interface OutputConverter {
-    String convert(Level level, Throwable throwable, String tag, String message);
-}
-```
-
-So, the initialization of `FileDebugOutput` could look like:
-```java
-private static DebugOutput getFileOutput(Context appContext, boolean isDebug) {
-    try {
-        return FileDebugOutput.newInstance(
-            isDebug,
-            true,
-            SimpleFileStrategy.newInstance(appContext.getExternalCacheDir(), "debug_logs")
-        );
-    } catch (FileDebugOutput.UnableToObtainFileException e) {
-        e.printStackTrace(); // Debug library is not initialized yet, we could not pass this throwable to it
-    } catch (SimpleFileStrategy.InitializationException e) {
-        e.printStackTrace();
-    }
-    return null;
-}
-```
-
-## Debug-UI
-[![Maven Central](https://img.shields.io/maven-central/v/ru.noties/debug-ui.svg)](http://search.maven.org/#search|ga|1|g%3A%22ru.noties%22%20AND%20a%3A%22debug-ui%22)
-```groovy
-compile 'ru.noties:debug-ui:x.x.x'
-compile 'ru.noties:storm:1.0.3' // required dependancy for writing logs to SQLite database
-```
-Debug-UI is a standalone library for visualizing Debug logs at your device for SDK_INT >= 14.
-
-![debug-ui](https://raw.githubusercontent.com/noties/Debug/master/pics/debug-ui.png)
-![debug-ui-expand](https://raw.githubusercontent.com/noties/Debug/master/pics/debug-ui-expand.png)
-
-```java
-final DebugOutput uiOutput = new AndroidUIDebugOutput(
-    mApplication, // Application
-    BuildConfig.DEBUG
-);
-```
-
-### Usage
-
-* Trace method calls till current method
-```java
-Debug.trace();
-```
-
-Output:
-![trace](https://raw.githubusercontent.com/noties/Debug/master/pics/trace.png)
-
-
-* All Android Log levels
-
+## Usage
+Debug has all the default Android log levels: **VERBOSE**, **DEBUG**, **INFO**, **WARN**, **ERROR**, **WTF**. Each level has corresponding Debug method:
 ```java
 Debug.v();
 Debug.d();
@@ -219,31 +105,105 @@ Debug.e();
 Debug.wtf();
 ```
 
-Output:
-![someMethod](https://raw.githubusercontent.com/noties/Debug/master/pics/someMethod.png)
-
-![simpleMethod](https://raw.githubusercontent.com/noties/Debug/master/pics/simpleMethod.png)
-
-![onCreate](https://raw.githubusercontent.com/noties/Debug/master/pics/onCreate.png)
-
-
-* Simple exception handling
-
+All methods take optional `Throwable` and `Object...`
 ```java
+int value = -1;
 try {
-    new AssertionError("This is exception");
+    value = /* obtrain value */;
+    Debug.i("obtained value: %d", value);
 } catch (Throwable throwable) {
-     Debug.e(e);
+    Debug.e(throwable);
+    Debug.w(throwable, "Exception executing try code block... value: %d", value);
 }
 ```
 
-Output:
-![someMethodWithException](https://raw.githubusercontent.com/noties/Debug/master/pics/someMethodWithException.png)
+If first argument is a String that has valid `String.format` modifiers, than `String.format` will be used with first argument as a pattern and all the rest arguments as `String.format` arguments
+```java
+Debug.i("%1$d + %1$d = %2$d", 2, (2 + 2)); // -> "2 + 2 = 4"
+Debug.i(throwable, "%1$d + %1$d = %2$d", 2, (2 + 2)); // -> "2 + 2 = 4" + throwable stacktrace
+```
 
+Else all arguments will be concatted into one string:
+```java
+Debug.i("first", 2, true, "forth", null); // -> "first, 2, true, forth, null"
+```
 
-* Timer with millis & nanos
+## Live templates (IDEA)
+There is a file with basic templates: [templates_ru_noties_debug.xml](templates_ru_noties_debug.xml).
 
-*see sample application for code*
+[Learn how to add custom live templates to a IDEA IDE](https://www.jetbrains.com/help/idea/2016.3/live-templates.html)
 
-Output millis:
-![timer](https://raw.githubusercontent.com/noties/Debug/master/pics/timer.png)
+The shortkeys are:
+```
+dv [tab] -> Debug.v();
+dd [tab] -> Debug.d();
+di [tab] -> Debug.i();
+dw [tab] -> Debug.w();
+de [tab] -> Debug.e();
+```
+
+There are also shortkeys to parse current method arguments and prepare a valid `Debug.*` call, for example:
+```java
+void someMethod(int i, double d, String s) {
+    // try `dii` shortcut
+    Debug.i("i : %s, d: %s, s: %s", i, d, s); // here is what will be generated
+}
+```
+
+These are as follows:
+```
+dvv [tab]
+ddd [tab]
+dii [tab]
+dww [tab]
+dee [tab]
+```
+
+![live_template](pics/debug_live_template.gif)
+
+## Custom outputs
+```java
+public interface DebugOutput {
+
+    void log(
+            /*Nonnull*/ Level level,
+            /*Nullable*/ Throwable throwable,
+            /*Nullable*/ String tag,
+            /*Nullable*/ String message
+    );
+
+    boolean isDebug();
+}
+```
+Just implement `DebugOutput` and pass an instance of it to the `Debug.init` call
+
+## Changes in version 3
+
+* `Debug.init()` now takes an array or a Collection of `DebugOutput`'s (no need to create a `DebugOutputFacade` (which is removed BTW)
+* If multiple `DebugOutput`'s must be `flattened` in one `DebugOutput` use `DebugOutputContainer` (which is used by default if `Debug.init` is called with multiple outputs)
+* Removed `ru.noties.debug.out` package
+* `ru.noties.debug.out.DebugOutput` -> `ru.noties.debug.DebugOutput`
+* `ru.noties.debug.out.AndroidLogDebugOutput` -> `ru.noties.debug.AndroidLogDebugOutput`
+* All `Debug.*` calls now accept an array of arguments (previously one would have to create a formatted string for that: `Debug.i("%d, %d, %d, %d", 2, 3, 4, 5);`, now: `Debug.i(2, 3, 4, 5);`
+* Added `ru.noties.debug.SystemOutDebugOutput` for writing logs to `System.out` & `System.err` (can be used in plain Java projects, or in test environment)
+* Removed Timer
+* Removed `library-ui` module (discountinued)
+* Removed `apt-compiler` & `apt-annotations` modules (discontinued)
+
+## License
+
+```
+  Copyright 2017 Dimitry Ivanov (mail@dimitryivanov.ru)
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+```

@@ -1,16 +1,4 @@
-buildscript {
-    repositories {
-        jcenter()
-    }
-
-    dependencies {
-        classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
-    }
-}
-
-
 apply plugin: 'com.android.application'
-apply plugin: 'com.neenbedankt.android-apt'
 
 android {
 
@@ -51,5 +39,5 @@ dependencies {
     testCompile "org.robolectric:robolectric:${ROBOLECTRIC_VERSION}"
 
     compile project(':library')
-    apt project(':library-remove-compiler')
+    annotationProcessor project(':library-remove-compiler')
 }

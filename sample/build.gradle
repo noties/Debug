@@ -29,11 +29,11 @@ android {
     buildTypes {
 
         release {
-
+            buildConfigField 'boolean', 'REMOVE_DEBUG_LOGS', 'true'
         }
 
         debug {
-
+            buildConfigField 'boolean', 'REMOVE_DEBUG_LOGS', 'false'
         }
     }
 }
