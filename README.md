@@ -154,7 +154,7 @@ There is a file with basic templates: [templates_ru_noties_debug.xml](templates_
 
 [Learn how to add custom live templates to a IDEA IDE](https://www.jetbrains.com/help/idea/2016.3/live-templates.html)
 
-The shortkeys are:
+The shortkeys are (works in Kotlin and Java):
 ```
 dv [tab] -> Debug.v();
 dd [tab] -> Debug.d();
@@ -163,7 +163,7 @@ dw [tab] -> Debug.w();
 de [tab] -> Debug.e();
 ```
 
-There are also shortkeys to parse current method arguments and prepare a valid `Debug.*` call, for example:
+There are also shortkeys to parse current method arguments and prepare a valid `Debug.*` call, for example (works only in Java):
 ```java
 void someMethod(int i, double d, String s) {
     // try `dii` shortcut
