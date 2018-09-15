@@ -1,19 +1,18 @@
 package ru.noties.debug.sample;
 
+import android.app.Activity;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 
 import java.net.UnknownHostException;
 
 import ru.noties.debug.Debug;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends Activity {
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
 
         // todo, NOTICE that if enumeration of arguments is passed to the method
         // and first one is String -> there will be an exception, because Debug will try to call
@@ -33,13 +32,6 @@ public class MainActivity extends AppCompatActivity {
 //        for (int i = 0; i < 10; i++, Debug.i("hello from a for loop")) {
 //            Debug.i("body of a for loop");
 //        }
-
-        if (savedInstanceState == null) {
-            getSupportFragmentManager()
-                    .beginTransaction()
-                    .add(R.id.content, new MainFragment())
-                    .commit();
-        }
 
         // Trace current method calls chain
         Debug.trace(100);

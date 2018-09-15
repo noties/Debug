@@ -1,1 +1,1 @@
-include ':sample', ':library-remove-compiler', ':library', ':library-remove-compiler-test'
+include ':sample', ':library'

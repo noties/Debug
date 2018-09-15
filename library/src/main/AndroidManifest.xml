@@ -1,6 +1,1 @@
-<manifest
-    package="ru.noties.debug">
-
-    <application/>
-
-</manifest>
+<manifest package="ru.noties.debug" />

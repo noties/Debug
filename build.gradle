@@ -1,32 +1,47 @@
-// Top-level build file where you can add configuration options common to all sub-projects/modules.
-
 buildscript {
     repositories {
         jcenter()
+        google()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.2.3'
-
-        // NOTE: Do not place your application dependencies here; they belong
-        // in the individual module build.gradle files
+        classpath 'com.android.tools.build:gradle:3.0.1'
     }
 }
 
 allprojects {
     repositories {
         jcenter()
+        google()
     }
+    version = VERSION_NAME
+    group = GROUP
+}
+
+wrapper {
+    gradleVersion '4.10'
+    distributionType 'all'
+}
+
+if (hasProperty('local')) {
+    if (!hasProperty('LOCAL_MAVEN_URL')) {
+        throw new RuntimeException('Cannot publish to local maven as no such property exists: LOCAL_MAVEN_URL')
+    }
+    ext.RELEASE_REPOSITORY_URL = LOCAL_MAVEN_URL
+    ext.SNAPSHOT_REPOSITORY_URL = LOCAL_MAVEN_URL
 }
 
 ext {
-    // used to share source folder for compiler and library (so we do not create another artifact)
-    SRC_ANNOTATIONS = "${rootProject.rootDir}${File.separator}src-annotations"
 
-    TARGET_SDK = 25
-    MIN_SDK = 8
-    BUILD_TOOLS = '25.0.2'
+    config = [
+            'target-sdk'     : 27,
+            'min-sdk'        : 8,
+            'build-tools'    : '27.0.3',
+            'push-aar-gradle': 'https://raw.githubusercontent.com/noties/gradle-mvn-push/master/gradle-mvn-push-aar.gradle'
+    ]
 
-    // SUPPORT_VERSION = '25.1.1'
-    JUNIT_VERSION = '4.12'
-    ROBOLECTRIC_VERSION = '3.2.2'
+    deps = [:]
+
+    deps['test'] = [
+            'junit': 'junit:junit:4.12'
+    ]
 }

@@ -1,48 +1,20 @@
-buildscript {
-    repositories {
-        jcenter()
-    }
-
-    dependencies {
-        classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
-    }
-}
-
-
 apply plugin: 'com.android.application'
-apply plugin: 'com.neenbedankt.android-apt'
 
 android {
 
-    compileSdkVersion TARGET_SDK
-    buildToolsVersion BUILD_TOOLS
+    compileSdkVersion config['target-sdk']
+    buildToolsVersion config['build-tools']
 
     defaultConfig {
 
         applicationId "ru.noties.debug.sample"
-        minSdkVersion MIN_SDK
-        targetSdkVersion TARGET_SDK
-        versionCode VERSION_CODE as int
-        versionName VERSION_NAME
-    }
-
-    buildTypes {
-
-        release {
-            buildConfigField 'boolean', 'REMOVE_DEBUG_LOGS', 'true'
-        }
-
-        debug {
-            buildConfigField 'boolean', 'REMOVE_DEBUG_LOGS', 'false'
-        }
+        minSdkVersion config['min-sdk']
+        targetSdkVersion config['target-sdk']
+        versionCode 1
+        versionName version
     }
 }
 
 dependencies {
-
-    compile 'com.android.support:appcompat-v7:23.2.0'
-
-    compile project(':library')
-
-    apt project(':library-remove-compiler')
+    implementation project(':library')
 }

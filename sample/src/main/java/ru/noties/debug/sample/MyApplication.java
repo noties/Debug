@@ -4,9 +4,8 @@ import android.app.Application;
 
 import ru.noties.debug.AndroidLogDebugOutput;
 import ru.noties.debug.Debug;
-import ru.noties.debug.DebugRemove;
 
-@DebugRemove(false)
+
 public class MyApplication extends Application {
 
 //    public void a() {
