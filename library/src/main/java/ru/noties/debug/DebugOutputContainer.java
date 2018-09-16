@@ -32,14 +32,12 @@ public class DebugOutputContainer implements DebugOutput {
 
     DebugOutputContainer(@NonNull Collection<? extends DebugOutput> outputs) {
         final List<DebugOutput> list = new ArrayList<>(outputs.size());
-        boolean isDebug = false;
         for (DebugOutput output : outputs) {
             if (output != null && output.isDebug()) {
-                isDebug = true;
                 list.add(output);
             }
         }
-        this.isDebug = isDebug;
+        this.isDebug = list.size() > 0;
         this.outputs = isDebug
                 ? Collections.unmodifiableList(list)
                 : Collections.<DebugOutput>emptyList();

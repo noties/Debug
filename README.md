@@ -1,14 +1,12 @@
 # Debug
 [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Debug-brightgreen.svg?style=flat)](https://android-arsenal.com/details/1/1038)
 [![Maven Central](https://img.shields.io/maven-central/v/ru.noties/debug.svg)](http://search.maven.org/#search|ga|1|g%3A%22ru.noties%22%20AND%20a%3A%22debug%22)
-[![Maven Central](https://img.shields.io/maven-central/v/ru.noties/debug-remove.svg)](http://search.maven.org/#search|ga|1|g%3A%22ru.noties%22%20AND%20a%3A%22debug-remove%22)
 
 Fast, easy and poweful logging utility for Android and Java.
 * Automatic tags based on Java class and method name, easy navigation to that call from IDE console output.
 * Build-in string formatting
 * Customizable outputs ready for extension (console, file, network, etc)
 * Easy method chain tracing (current method calls chain that triggered execution), navigatable from IDE console output
-* Processor to actually **remove** all logging calls (not suppress, but modify Java AST to remove all calls from source code)
 
 
 All links are clickable and clicking on them will navigate to the referenced method in an IDE:
@@ -28,10 +26,7 @@ Quick peek on live templates:
 In your `dependencies` block in `build.gradle`:
 ```gradle
 // the core library
-compile 'ru.noties:debug:3.0.0@jar'
-
-// annotation processor to remove all logging calls
-annotationProcessor 'ru.noties:debug-remove:3.0.0'
+compile 'ru.noties:debug:4.0.0'
 ```
 
 
@@ -47,48 +42,7 @@ final List<DebugOutput> outputs = /*obtain desired outputs)*/;
 Debug.init(outputs);
 ```
 
-
-In order to use processor, that removes all `Debug.*` calls you must annotate any class in your project with `@ru.noties.debug.DebugRemove` (Your application class is a wise choice):
-```java
-@DebugRemove
-public class MyApplication extends android.app.Application {}
-```
-
-`DebugRemove` takes optional boolean value that indicates if processor must actually modify source code
-```java
-@DebugRemove(true); // default value is `true`, so `@DebugRemove` can be used
-@DebugRemove(false);
-```
-
-
-Unfortunatelly one cannot use `BuildConfig.DEBUG` value as it's not a compile time constant (`Boolean.parseBoolean("true");`). In case of Android one can add this simple property to each buildType:
-```gradle
-android {
-
-    /* rest of the closure is omitted for brevity */
-
-    buildTypes {
-
-        release {
-            buildConfigField 'boolean', 'REMOVE_DEBUG_LOGS', 'true'
-        }
-
-        debug {
-            buildConfigField 'boolean', 'REMOVE_DEBUG_LOGS', 'false'
-        }
-    }
-}
-```
-
-
-And then can be used:
-```java
-@DebugRemove(BuildConfig.REMOVE_DEBUG_LOGS)
-public class MyApplication extends android.app.Application {}
-```
-
-
-If proguard is used this configuration can be used to remove all the log calls (instead of using processor):
+If proguard is used this configuration can be used to remove all the log calls:
 ```proguard
 -assumenosideeffects class ru.noties.debug.Debug {
     public static *** v(...);
@@ -187,10 +141,10 @@ dee [tab]
 public interface DebugOutput {
 
     void log(
-            /*Nonnull*/ Level level,
-            /*Nullable*/ Throwable throwable,
-            /*Nullable*/ String tag,
-            /*Nullable*/ String message
+            @NonNull Level level,
+            @Nullable Throwable throwable,
+            @NonNull String tag,
+            @Nullable String message
     );
 
     boolean isDebug();
@@ -198,7 +152,15 @@ public interface DebugOutput {
 ```
 Just implement `DebugOutput` and pass an instance of it to the `Debug.init` call
 
-## Changes in version 3
+## Changes in version 4.0.0
+* Removed `debug-remove` aftifact
+* Added nullability annotations where matter
+* Overloaded some logging methods to not create an array of arguments with each call
+* Added array handling for arguments (automatically expanded via `Arrays.deepToString()`
+* `DebugOutputContainer` is initialized once (during creation), if a `DebugOutput` returns `false` from debug (during configuration) it won't be included
+* Added `ru.noties.Debug` as default tag when caller tag cannot be obtained via reflection (better display in logcat)
+
+### Changes in version 3.0.0
 
 * `Debug.init()` now takes an array or a Collection of `DebugOutput`'s (no need to create a `DebugOutputFacade` (which is removed BTW)
 * If multiple `DebugOutput`'s must be `flattened` in one `DebugOutput` use `DebugOutputContainer` (which is used by default if `Debug.init` is called with multiple outputs)
