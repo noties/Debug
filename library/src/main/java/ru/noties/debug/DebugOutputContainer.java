@@ -1,32 +1,63 @@
 package ru.noties.debug;
 
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
 @SuppressWarnings("WeakerAccess")
 public class DebugOutputContainer implements DebugOutput {
 
-    private final DebugOutput[] outputs;
+    @NonNull
+    public static DebugOutputContainer create(DebugOutput... outputs) {
+        return new DebugOutputContainer(Arrays.asList(outputs));
+    }
 
-    public DebugOutputContainer(DebugOutput[] outputs) {
-        this.outputs = outputs != null
-                ? outputs
-                : new DebugOutput[0];
+    @NonNull
+    public static DebugOutputContainer create(@NonNull Collection<? extends DebugOutput> outputs) {
+        return new DebugOutputContainer(outputs);
+    }
+
+    private final boolean isDebug;
+    private final List<DebugOutput> outputs;
+
+    @Deprecated
+    public DebugOutputContainer(@NonNull DebugOutput[] outputs) {
+        this(Arrays.asList(outputs));
+    }
+
+    DebugOutputContainer(@NonNull Collection<? extends DebugOutput> outputs) {
+        final List<DebugOutput> list = new ArrayList<>(outputs.size());
+        boolean isDebug = false;
+        for (DebugOutput output : outputs) {
+            if (output != null && output.isDebug()) {
+                isDebug = true;
+                list.add(output);
+            }
+        }
+        this.isDebug = isDebug;
+        this.outputs = isDebug
+                ? Collections.unmodifiableList(list)
+                : Collections.<DebugOutput>emptyList();
     }
 
     @Override
-    public void log(Level level, Throwable throwable, String tag, String message) {
-        for (DebugOutput output: outputs) {
-            if (output != null && output.isDebug()) {
-                output.log(level, throwable, tag, message);
-            }
+    public void log(
+            @NonNull Level level,
+            @Nullable Throwable throwable,
+            @NonNull String tag,
+            @Nullable String message) {
+        for (DebugOutput output : outputs) {
+            output.log(level, throwable, tag, message);
         }
     }
 
     @Override
     public boolean isDebug() {
-        for (DebugOutput output: outputs) {
-            if (output != null && output.isDebug()) {
-                return true;
-            }
-        }
-        return false;
+        return isDebug;
     }
 }

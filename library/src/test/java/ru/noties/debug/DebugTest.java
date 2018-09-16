@@ -1,5 +1,8 @@
 package ru.noties.debug;
 
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -9,9 +12,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -88,7 +93,7 @@ public class DebugTest {
         Debug.init(first, second, third);
         assertTrue(Debug.isDebug());
 
-        for (Level level: LEVELS) {
+        for (Level level : LEVELS) {
             assertCall(second, level, "second one, yeah", array("second one, yeah"));
         }
 
@@ -106,7 +111,7 @@ public class DebugTest {
         Debug.init(Arrays.asList(first, second, third));
         assertTrue(Debug.isDebug());
 
-        for (Level level: LEVELS) {
+        for (Level level : LEVELS) {
             assertCall(second, level, "second one, yeah", array("second one, yeah"));
         }
 
@@ -130,7 +135,7 @@ public class DebugTest {
         Debug.init(mock);
         assertTrue(Debug.isDebug());
 
-        for (Level level: LEVELS) {
+        for (Level level : LEVELS) {
             assertCall(mock, level, null, null);
         }
 
@@ -143,7 +148,7 @@ public class DebugTest {
         final DebugOutputMock mock = new DebugOutputMock(true);
         Debug.init(mock);
 
-        for (Level level: LEVELS) {
+        for (Level level : LEVELS) {
             assertCall(mock, level, new NullPointerException(), null, null);
         }
         assertEquals(LEVELS.length, mock.size());
@@ -155,7 +160,7 @@ public class DebugTest {
         final DebugOutputMock mock = new DebugOutputMock(true);
         Debug.init(mock);
 
-        for (Level level: LEVELS) {
+        for (Level level : LEVELS) {
             assertCall(mock, level, "Simple one", array("Simple one"));
         }
 
@@ -168,7 +173,7 @@ public class DebugTest {
         final DebugOutputMock mock = new DebugOutputMock(true);
         Debug.init(mock);
 
-        for (Level level: LEVELS) {
+        for (Level level : LEVELS) {
             assertCall(mock, level, new RuntimeException(), "Exception here", array("Exception here"));
         }
 
@@ -181,7 +186,7 @@ public class DebugTest {
         final DebugOutputMock mock = new DebugOutputMock(true);
         Debug.init(mock);
 
-        for (Level level: LEVELS) {
+        for (Level level : LEVELS) {
             assertCall(mock, level, "0, 1, 2, 3, 4, 5", array(0, 1, 2, 3, 4, 5));
         }
 
@@ -194,7 +199,7 @@ public class DebugTest {
         final DebugOutputMock mock = new DebugOutputMock(true);
         Debug.init(mock);
 
-        for (Level level: LEVELS) {
+        for (Level level : LEVELS) {
             assertCall(mock, level, new IllegalArgumentException(), "true, hello, 76", array(true, "hello", 76));
         }
 
@@ -207,7 +212,7 @@ public class DebugTest {
         final DebugOutputMock mock = new DebugOutputMock(true);
         Debug.init(mock);
 
-        for (Level level: LEVELS) {
+        for (Level level : LEVELS) {
             assertCall(mock, level, "null __ null ++ null", array("%s __ %s ++ %s", null, null, null));
         }
 
@@ -220,7 +225,7 @@ public class DebugTest {
         final DebugOutputMock mock = new DebugOutputMock(true);
         Debug.init(mock);
 
-        for (Level level: LEVELS) {
+        for (Level level : LEVELS) {
             assertCall(mock, level, new Exception(), "2 + 2 = 5", array("%1$d + %1$d = %2$s", 2, "5"));
         }
 
@@ -244,8 +249,219 @@ public class DebugTest {
 
         final String name = mTestName.getMethodName();
 
-        for (LogItem item: mock.logItems) {
+        for (LogItem item : mock.logItems) {
             assertTrue(item.tag.contains(name + "(DebugTest.java:"));
+        }
+    }
+
+    @Test
+    public void arrays_expanded() {
+
+        final Object[] args = {
+                new byte[]{0, 0, 0, 1},
+                new short[]{0, 0, 1, 0},
+                new int[]{0, 1, 0, 0},
+                new long[]{1, 0, 0, 0},
+                new char[]{1, 0, 0, 1},
+                new float[]{1, 0, 1, 0},
+                new double[]{1, 1, 0, 0},
+                new boolean[]{true, true, false, true},
+                new String[]{"1", "1", "1", "0"}
+        };
+
+        final DebugOutputMock mock = new DebugOutputMock(true);
+        Debug.init(mock);
+
+        for (Object arg : args) {
+            Debug.i(arg);
+        }
+
+        final List<LogItem> logItems = mock.logItems;
+
+        assertEquals(args.length, logItems.size());
+
+        final String[] expected = {
+                Arrays.toString((byte[]) args[0]),
+                Arrays.toString((short[]) args[1]),
+                Arrays.toString((int[]) args[2]),
+                Arrays.toString((long[]) args[3]),
+                Arrays.toString((char[]) args[4]),
+                Arrays.toString((float[]) args[5]),
+                Arrays.toString((double[]) args[6]),
+                Arrays.toString((boolean[]) args[7]),
+                Arrays.toString((Object[]) args[8])
+        };
+
+        for (int i = 0, length = expected.length; i < length; i++) {
+            assertEquals(expected[i], expected[i], logItems.get(i).message);
+        }
+    }
+
+    @Test
+    public void arrays_expanded_multi() {
+
+        final Object[] args = {
+                new byte[][]{{0, 0, 0, 1}, {0, 0, 0, 1}},
+                new short[][]{{0, 0, 1, 0}, {0, 0, 1, 0}},
+                new int[][]{{0, 1, 0, 0}, {0, 1, 0, 0}},
+                new long[][]{{1, 0, 0, 0}, {1, 0, 0, 0}},
+                new char[][]{{1, 0, 0, 1}, {1, 0, 0, 1}},
+                new float[][]{{1, 0, 1, 0}, {1, 0, 1, 0}},
+                new double[][]{{1, 1, 0, 0}, {1, 1, 0, 0}},
+                new boolean[][]{{true, true, false, true}, {true, true, false, true}},
+                new String[][]{{"1", "1", "1", "0"}, {"1", "1", "1", "0"}}
+        };
+
+        final DebugOutputMock mock = new DebugOutputMock(true);
+        Debug.init(mock);
+
+        for (Object arg : args) {
+            Debug.i(arg);
+        }
+
+        final List<LogItem> logItems = mock.logItems;
+
+        assertEquals(args.length, logItems.size());
+
+        for (int i = 0, length = args.length; i < length; i++) {
+            assertEquals(Arrays.deepToString((Object[]) args[i]), logItems.get(i).message);
+        }
+    }
+
+    @Test
+    public void log_methods_present() {
+
+        final List<Class[]> args = Arrays.asList(
+                new Class[0],
+                new Class[]{Object.class},
+                new Class[]{Throwable.class},
+                new Class[]{Throwable.class, Object[].class},
+                new Class[]{Object[].class}
+        );
+
+        for (Level level : Level.values()) {
+            final String name = level.name().toLowerCase(Locale.US);
+            for (Class[] cl : args) {
+                try {
+                    assertNotNull(Debug.class.getMethod(name, cl));
+                } catch (Throwable t) {
+                    throw new RuntimeException(t);
+                }
+            }
+        }
+    }
+
+    @Test
+    public void verbose_calls() {
+
+        final DebugOutputMock mock = new DebugOutputMock(true);
+        Debug.init(mock);
+
+        Debug.v();
+        Debug.v("o1");
+        Debug.v(new Throwable());
+        Debug.v(new Throwable(), "args");
+        Debug.v("o1", "o2");
+
+        assertEquals(5, mock.logItems.size());
+
+        for (LogItem item : mock.logItems) {
+            assertEquals(Level.V, item.level);
+        }
+    }
+
+    @Test
+    public void info_calls() {
+
+        final DebugOutputMock mock = new DebugOutputMock(true);
+        Debug.init(mock);
+
+        Debug.i();
+        Debug.i("o1");
+        Debug.i(new Throwable());
+        Debug.i(new Throwable(), "args");
+        Debug.i("o1", "o2");
+
+        assertEquals(5, mock.logItems.size());
+
+        for (LogItem item : mock.logItems) {
+            assertEquals(Level.I, item.level);
+        }
+    }
+
+    @Test
+    public void debug_calls() {
+
+        final DebugOutputMock mock = new DebugOutputMock(true);
+        Debug.init(mock);
+
+        Debug.d();
+        Debug.d("o1");
+        Debug.d(new Throwable());
+        Debug.d(new Throwable(), "args");
+        Debug.d("o1", "o2");
+
+        assertEquals(5, mock.logItems.size());
+
+        for (LogItem item : mock.logItems) {
+            assertEquals(Level.D, item.level);
+        }
+    }
+
+    @Test
+    public void warn_calls() {
+
+        final DebugOutputMock mock = new DebugOutputMock(true);
+        Debug.init(mock);
+
+        Debug.w();
+        Debug.w("o1");
+        Debug.w(new Throwable());
+        Debug.w(new Throwable(), "args");
+        Debug.w("o1", "o2");
+
+        assertEquals(5, mock.logItems.size());
+
+        for (LogItem item : mock.logItems) {
+            assertEquals(Level.W, item.level);
+        }
+    }
+
+    @Test
+    public void error_calls() {
+
+        final DebugOutputMock mock = new DebugOutputMock(true);
+        Debug.init(mock);
+
+        Debug.e();
+        Debug.e("o1");
+        Debug.e(new Throwable());
+        Debug.e(new Throwable(), "args");
+        Debug.e("o1", "o2");
+
+        assertEquals(5, mock.logItems.size());
+
+        for (LogItem item : mock.logItems) {
+            assertEquals(Level.E, item.level);
+        }
+    }
+
+    @Test
+    public void wtf_calls() {
+
+        final DebugOutputMock mock = new DebugOutputMock(true);
+        Debug.init(mock);
+
+        Debug.wtf();
+        Debug.wtf("o1");
+        Debug.wtf(new Throwable());
+        Debug.wtf(new Throwable(), "args");
+        Debug.wtf("o1", "o2");
+
+        assertEquals(5, mock.logItems.size());
+
+        for (LogItem item : mock.logItems) {
+            assertEquals(Level.WTF, item.level);
         }
     }
 
@@ -350,7 +566,11 @@ public class DebugTest {
         }
 
         @Override
-        public void log(Level level, Throwable throwable, String tag, String message) {
+        public void log(
+                @NonNull Level level,
+                @Nullable Throwable throwable,
+                @NonNull String tag,
+                @Nullable String message) {
             logItems.add(new LogItem(level, throwable, tag, message));
         }
 

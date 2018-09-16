@@ -2,43 +2,45 @@ package ru.noties.debug.sample;
 
 import android.app.Application;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
+
 import ru.noties.debug.AndroidLogDebugOutput;
 import ru.noties.debug.Debug;
 
 
 public class MyApplication extends Application {
 
-//    public void a() {
-//Debug.init(new AndroidLogDebugOutput(/*isDebug*/true)); // BuildConfig.DEBUG can be used
-//Debug.init(new AndroidLogDebugOutput(true), new SystemOutDebugOutput(true));
-//final List<DebugOutput> outputs = /*obtain desired outputs)*/;
-//Debug.init(outputs);
-//
-//Debug.v();
-//Debug.d();
-//Debug.i();
-//Debug.w();
-//Debug.e();
-//Debug.wtf();
-//
-//int value = -1;
-//try {
-//    value = /* obtrain value */;
-//    Debug.i("obtained value: %d", value);
-//} catch (Throwable throwable) {
-//    Debug.e(throwable);
-//    Debug.w(throwable, "Exception executing try code block... value: %d");
-//}
-//    }
-
     @Override
     public void onCreate() {
         super.onCreate();
 
-        Debug.init(new AndroidLogDebugOutput(BuildConfig.DEBUG));
-    }
+        final File file = new File(getFilesDir(), "debug.log");
 
-//    public void someMethod(int i, double d, String s) {
-//        Debug.i("i: %s, d: %s, s: %s", i, d, s);
-//    }
+        // let's clear the previous logs just for simplicity
+        if (file.exists() && file.length() > 0) {
+            Writer writer = null;
+            try {
+                writer = new FileWriter(file, false);
+                writer.write("");
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                if (writer != null) {
+                    try {
+                        writer.close();
+                    } catch (IOException e) {
+                        // no op
+                    }
+                }
+            }
+        }
+
+        Debug.init(
+                AndroidLogDebugOutput.create(BuildConfig.DEBUG),
+                FileDebugOutput.create(BuildConfig.DEBUG, file)
+        );
+    }
 }

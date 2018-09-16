@@ -1,25 +1,40 @@
 package ru.noties.debug;
 
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Locale;
 import java.util.regex.Pattern;
 
-@SuppressWarnings("WeakerAccess")
+import static ru.noties.debug.Level.D;
+import static ru.noties.debug.Level.E;
+import static ru.noties.debug.Level.I;
+import static ru.noties.debug.Level.V;
+import static ru.noties.debug.Level.W;
+import static ru.noties.debug.Level.WTF;
+
+@SuppressWarnings({"WeakerAccess", "SameParameterValue"})
 public class Debug {
 
     private static final Debug INSTANCE = new Debug();
-    private static final Pattern STRING_FORMAT_PATTERN = Pattern.compile("%(\\d+\\$)?([-#+ 0,(<]*)?(\\d+)?(\\.\\d+)?([tT])?([a-zA-Z%])");
+
+    private static final Pattern STRING_FORMAT_PATTERN =
+            Pattern.compile("%(\\d+\\$)?([-#+ 0,(<]*)?(\\d+)?(\\.\\d+)?([tT])?([a-zA-Z%])");
 
     private static final String FILE_NAME = "Debug.java";
     private static final String STARTING_MESSAGE_PATTERN_LINK = "%1$s(%2$s:%3$d)";
     private static final String TRACE_FIRST_LINE = "trace:\n";
 
+    private static final String DEFAULT_TAG = "ru.noties.Debug";
+
     private DebugOutput output;
 
-    private Debug() {}
+    private Debug() {
+    }
 
 
-    // can be empty, but there will be no logging
     public static void init(DebugOutput... outputs) {
 
         final DebugOutput out;
@@ -33,20 +48,18 @@ public class Debug {
             if (length == 1) {
                 out = outputs[0];
             } else {
-                out = new DebugOutputContainer(outputs);
+                out = DebugOutputContainer.create(outputs);
             }
         }
 
         INSTANCE.output = out;
     }
 
-    public static void init(Collection<? extends DebugOutput> outputs) {
+    public static void init(@NonNull Collection<? extends DebugOutput> outputs) {
 
         final DebugOutput out;
 
-        final int length = outputs != null
-                ? outputs.size()
-                : 0;
+        final int length = outputs.size();
 
         if (length == 0) {
             out = null;
@@ -54,9 +67,7 @@ public class Debug {
             if (length == 1) {
                 out = outputs.iterator().next();
             } else {
-                final DebugOutput[] debugOutputs = new DebugOutput[length];
-                outputs.toArray(debugOutputs);
-                out = new DebugOutputContainer(debugOutputs);
+                out = DebugOutputContainer.create(outputs);
             }
         }
 
@@ -68,63 +79,149 @@ public class Debug {
         return output != null && output.isDebug();
     }
 
+    // #############################################################################################
+    // VERBOSE
 
-    public static void v(Throwable throwable, Object... args) {
-        log(Level.V, throwable, args);
+    public static void v() {
+        log(V, null, null);
+    }
+
+    public static void v(Object o1) {
+        log(V, null, o1);
     }
 
     public static void v(Object... args) {
-        log(Level.V, null, args);
+        log(V, null, args);
     }
 
+    public static void v(Throwable throwable) {
+        log(V, throwable, null);
+    }
 
-    public static void d(Throwable throwable, Object... args) {
-        log(Level.D, throwable, args);
+    public static void v(Throwable throwable, Object... args) {
+        log(V, throwable, args);
+    }
+
+    // #############################################################################################
+    // DEBUG
+
+    public static void d() {
+        log(D, null, null);
+    }
+
+    public static void d(Object o1) {
+        log(D, null, o1);
     }
 
     public static void d(Object... args) {
-        log(Level.D, null, args);
+        log(D, null, args);
     }
 
+    public static void d(Throwable throwable) {
+        log(D, throwable, null);
+    }
 
-    public static void i(Throwable throwable, Object... args) {
-        log(Level.I, throwable, args);
+    public static void d(Throwable throwable, Object... args) {
+        log(D, throwable, args);
+    }
+
+    // #############################################################################################
+    // INFO
+
+    public static void i() {
+        log(I, null, null);
+    }
+
+    public static void i(Object o1) {
+        log(I, null, o1);
     }
 
     public static void i(Object... args) {
-        log(Level.I, null, args);
+        log(I, null, args);
     }
 
+    public static void i(Throwable throwable) {
+        log(I, throwable, null);
+    }
 
-    public static void w(Throwable throwable, Object... args) {
-        log(Level.W, throwable, args);
+    public static void i(Throwable throwable, Object... args) {
+        log(I, throwable, args);
+    }
+
+    // #############################################################################################
+    // WARN
+
+    public static void w() {
+        log(W, null, null);
+    }
+
+    public static void w(Object o1) {
+        log(W, null, o1);
     }
 
     public static void w(Object... args) {
-        log(Level.W, null, args);
+        log(W, null, args);
     }
 
+    public static void w(Throwable throwable) {
+        log(W, throwable, null);
+    }
 
-    public static void e(Throwable throwable, Object... args) {
-        log(Level.E, throwable, args);
+    public static void w(Throwable throwable, Object... args) {
+        log(W, throwable, args);
+    }
+
+    // #############################################################################################
+    // ERROR
+
+    public static void e() {
+        log(E, null, null);
+    }
+
+    public static void e(Object o1) {
+        log(E, null, o1);
     }
 
     public static void e(Object... args) {
-        log(Level.E, null, args);
+        log(E, null, args);
     }
 
+    public static void e(Throwable throwable) {
+        log(E, throwable, null);
+    }
 
-    public static void wtf(Throwable throwable, Object... args) {
-        log(Level.WTF, throwable, args);
+    public static void e(Throwable throwable, Object... args) {
+        log(E, throwable, args);
+    }
+
+    // #############################################################################################
+    // WTF
+
+    public static void wtf() {
+        log(WTF, null, null);
+    }
+
+    public static void wtf(Object o1) {
+        log(WTF, null, o1);
     }
 
     public static void wtf(Object... args) {
-        log(Level.WTF, null, args);
+        log(WTF, null, args);
     }
 
+    public static void wtf(Throwable throwable) {
+        log(WTF, throwable, null);
+    }
+
+    public static void wtf(Throwable throwable, Object... args) {
+        log(WTF, throwable, args);
+    }
+
+    // #############################################################################################
+    // TRACE
 
     public static void trace() {
-        trace(Level.V, 0);
+        trace(V, 0);
     }
 
     public static void trace(Level level) {
@@ -132,7 +229,7 @@ public class Debug {
     }
 
     public static void trace(int maxItems) {
-        trace(Level.V, maxItems);
+        trace(V, maxItems);
     }
 
     public static void trace(Level level, int maxItems) {
@@ -149,7 +246,7 @@ public class Debug {
         final StackTraceElement[] elements = obtainStackTrace();
         if (elements == null
                 || elements.length == 0) {
-            tag = null;
+            tag = DEFAULT_TAG;
             message = null;
         } else {
             tag = callerTag(elements[0]);
@@ -159,8 +256,18 @@ public class Debug {
         output.log(level, null, tag, message);
     }
 
+    private static void log(@NonNull Level level, @Nullable Throwable throwable, @Nullable Object o1) {
 
-    private static void log(Level level, Throwable throwable, Object[] args) {
+        final DebugOutput output = INSTANCE.output;
+        if (output == null
+                || !output.isDebug()) {
+            return;
+        }
+
+        output.log(level, throwable, callerTag(), logMessage(o1));
+    }
+
+    private static void log(@NonNull Level level, @Nullable Throwable throwable, Object[] args) {
 
         final DebugOutput output = INSTANCE.output;
         if (output == null
@@ -171,7 +278,7 @@ public class Debug {
         output.log(level, throwable, callerTag(), logMessage(args));
     }
 
-    // can be null
+    @NonNull
     private static String callerTag() {
 
         final String out;
@@ -182,16 +289,14 @@ public class Debug {
                 : 0;
 
         if (length == 0) {
-            out = null;
+            out = DEFAULT_TAG;
         } else {
 
-            String elementName;
             int first = -1;
 
             for (int i = 0; i < length; i++) {
 
-                elementName = elements[i].getFileName();
-                if (FILE_NAME.equals(elementName)) {
+                if (FILE_NAME.equals(elements[i].getFileName())) {
                     continue;
                 }
 
@@ -202,14 +307,15 @@ public class Debug {
             if (first > -1) {
                 out = callerTag(elements[first]);
             } else {
-                out = null;
+                out = DEFAULT_TAG;
             }
         }
 
         return out;
     }
 
-    private static String callerTag(StackTraceElement element) {
+    @NonNull
+    private static String callerTag(@NonNull StackTraceElement element) {
         return String.format(
                 Locale.US,
                 STARTING_MESSAGE_PATTERN_LINK,
@@ -219,7 +325,8 @@ public class Debug {
         );
     }
 
-    private static String logMessage(Object[] args) {
+    @Nullable
+    private static String logMessage(@Nullable Object... args) {
 
         final String out;
 
@@ -231,11 +338,11 @@ public class Debug {
             // nothing here
             out = null;
         } else {
+
+            // @since 4.0.0 process array arguments and automatically convert to a string
+            processArrays(args, length);
+
             if (length == 1) {
-                // we could insert here an array check, but... it just clutters the code
-                // plus we will need to insert a lot of checks for multidimensional array etc.
-                // Plus, it's weird that we will do this kind of check only for the first element
-                // anyways calling `Arrays.toString` is way better (as caller knows the type of an array at least)
                 out = String.valueOf(args[0]);
             } else {
 
@@ -243,6 +350,7 @@ public class Debug {
                 // if not, do treat first String argument just as simple Object
 
                 Object first = args[0];
+
                 if (first != null
                         && String.class.equals(first.getClass())) {
 
@@ -252,10 +360,10 @@ public class Debug {
                         System.arraycopy(args, 1, formatArgs, 0, length - 1);
                         out = String.format(pattern, formatArgs);
                     } else {
-                        out = concat(args);
+                        out = concat(args, length);
                     }
                 } else {
-                    out = concat(args);
+                    out = concat(args, length);
                 }
             }
         }
@@ -263,17 +371,17 @@ public class Debug {
         return out;
     }
 
-    private static String concat(Object[] args) {
+    @NonNull
+    private static String concat(@NonNull Object[] args, int length) {
         final StringBuilder builder = new StringBuilder();
-        for (int i = 0, length = args.length; i < length; i++) {
-            if (i != 0) {
-                builder.append(", ");
-            }
-            builder.append(args[i]);
+        builder.append(args[0]);
+        for (int i = 1; i < length; i++) {
+            builder.append(", ").append(args[i]);
         }
         return builder.toString();
     }
 
+    @Nullable
     private static StackTraceElement[] obtainStackTrace() {
 
         final StackTraceElement[] out;
@@ -287,13 +395,11 @@ public class Debug {
             out = null;
         } else {
 
-            String elementName;
             int start = -1;
 
             for (int i = 0; i < length; i++) {
 
-                elementName = elements[i].getFileName();
-                if (FILE_NAME.equals(elementName)) {
+                if (FILE_NAME.equals(elements[i].getFileName())) {
                     continue;
                 }
 
@@ -314,7 +420,8 @@ public class Debug {
         return out;
     }
 
-    private static String traceLogMessage(StackTraceElement[] elements, int maxItems) {
+    @NonNull
+    private static String traceLogMessage(@NonNull StackTraceElement[] elements, int maxItems) {
 
         final StringBuilder builder = new StringBuilder(TRACE_FIRST_LINE);
 
@@ -323,7 +430,7 @@ public class Debug {
 
         int items = 0;
 
-        for (StackTraceElement element: elements) {
+        for (StackTraceElement element : elements) {
 
             fileName = element.getFileName();
 
@@ -341,5 +448,35 @@ public class Debug {
         }
 
         return builder.toString();
+    }
+
+    private static void processArrays(@NonNull Object[] args, int length) {
+
+        if (length == 0) {
+            return;
+        }
+
+        Object obj;
+        Class<?> cl;
+
+        for (int i = 0; i < length; i++) {
+            obj = args[i];
+            if (obj != null) {
+                cl = obj.getClass();
+                if (cl.isArray()) {
+                    final String replace;
+                    if (cl == byte[].class) replace = Arrays.toString((byte[]) obj);
+                    else if (cl == short[].class) replace = Arrays.toString((short[]) obj);
+                    else if (cl == int[].class) replace = Arrays.toString((int[]) obj);
+                    else if (cl == long[].class) replace = Arrays.toString((long[]) obj);
+                    else if (cl == char[].class) replace = Arrays.toString((char[]) obj);
+                    else if (cl == float[].class) replace = Arrays.toString((float[]) obj);
+                    else if (cl == double[].class) replace = Arrays.toString((double[]) obj);
+                    else if (cl == boolean[].class) replace = Arrays.toString((boolean[]) obj);
+                    else replace = Arrays.deepToString((Object[]) obj);
+                    args[i] = replace;
+                }
+            }
+        }
     }
 }

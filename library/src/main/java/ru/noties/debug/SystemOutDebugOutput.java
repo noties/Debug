@@ -1,5 +1,8 @@
 package ru.noties.debug;
 
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+
 import java.io.PrintStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -9,8 +12,8 @@ import java.util.Locale;
 @SuppressWarnings("WeakerAccess")
 public class SystemOutDebugOutput implements DebugOutput {
 
-    private final boolean mIsDebug;
-    private final DateFormat mDateFormat;
+    private final boolean isDebug;
+    private final DateFormat dateFormat;
 
     public SystemOutDebugOutput(boolean debug) {
         this(debug, "MM-dd HH:mm:ss.SSS");
@@ -21,12 +24,16 @@ public class SystemOutDebugOutput implements DebugOutput {
     }
 
     public SystemOutDebugOutput(boolean debug, DateFormat dateFormat) {
-        mIsDebug = debug;
-        mDateFormat = dateFormat;
+        this.isDebug = debug;
+        this.dateFormat = dateFormat;
     }
 
     @Override
-    public void log(Level level, Throwable throwable, String tag, String message) {
+    public void log(
+            @NonNull Level level,
+            @Nullable Throwable throwable,
+            @NonNull String tag,
+            @Nullable String message) {
 
         final PrintStream out;
 
@@ -41,6 +48,10 @@ public class SystemOutDebugOutput implements DebugOutput {
                 out = System.out;
         }
 
+        if (message == null) {
+            message = "";
+        }
+
         out.print(message(level, tag, message));
         out.println();
 
@@ -49,9 +60,9 @@ public class SystemOutDebugOutput implements DebugOutput {
         }
     }
 
-    private String message(Level level, String tag, String message) {
+    private String message(@NonNull Level level, @NonNull String tag, @Nullable String message) {
         final String out;
-        final String date = mDateFormat.format(new Date());
+        final String date = dateFormat.format(new Date());
         if (message == null || message.length() == 0) {
             out = String.format("%s %s/ %s", date, level.name(), tag);
         } else {
@@ -62,6 +73,6 @@ public class SystemOutDebugOutput implements DebugOutput {
 
     @Override
     public boolean isDebug() {
-        return mIsDebug;
+        return isDebug;
     }
 }

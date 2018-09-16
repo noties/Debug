@@ -39,7 +39,9 @@ ext {
             'push-aar-gradle': 'https://raw.githubusercontent.com/noties/gradle-mvn-push/master/gradle-mvn-push-aar.gradle'
     ]
 
-    deps = [:]
+    deps = [
+            'support-annotations': 'com.android.support:support-annotations:27.1.1'
+    ]
 
     deps['test'] = [
             'junit': 'junit:junit:4.12'

@@ -23,6 +23,9 @@ artifacts {
 }
 
 dependencies {
+
+    api deps['support-annotations']
+
     testImplementation deps.test.junit
 }
 

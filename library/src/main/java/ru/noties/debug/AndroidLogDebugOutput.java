@@ -1,5 +1,7 @@
 package ru.noties.debug;
 
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -8,6 +10,11 @@ import java.io.StringWriter;
 
 public class AndroidLogDebugOutput implements DebugOutput {
 
+    @NonNull
+    public static AndroidLogDebugOutput create(boolean isDebug) {
+        return new AndroidLogDebugOutput(isDebug);
+    }
+
     private static final int MAX_LENGTH = 4000;
 
     private final boolean isDebug;
@@ -15,9 +22,13 @@ public class AndroidLogDebugOutput implements DebugOutput {
     public AndroidLogDebugOutput(boolean isDebug) {
         this.isDebug = isDebug;
     }
-    
+
     @Override
-    public void log(Level level, Throwable throwable, String tag, String message) {
+    public void log(
+            @NonNull Level level,
+            @Nullable Throwable throwable,
+            @NonNull String tag,
+            @Nullable String message) {
 
         if (throwable != null) {
             final String trace = throwableStackTrace(throwable);
@@ -32,19 +43,15 @@ public class AndroidLogDebugOutput implements DebugOutput {
                 ? message.length()
                 : 0;
 
-        final LogInvoke invoke = logInvoke(level);
-
         if (length == 0) {
-            // cannot print null...
-            invoke.invoke(tag, " ");
+            log(level, tag, " ");
         } else if (length < MAX_LENGTH) {
-            invoke.invoke(tag, message);
+            log(level, tag, message);
         } else {
             int start = 0;
             int end = MAX_LENGTH;
             while (end <= length) {
-                invoke.invoke(tag, message.substring(start, end));
-                tag = null;
+                log(level, tag, message.substring(start, end));
                 if (end == length) {
                     break;
                 } else {
@@ -60,6 +67,7 @@ public class AndroidLogDebugOutput implements DebugOutput {
         return isDebug;
     }
 
+    @NonNull
     private static String throwableStackTrace(Throwable throwable) {
         final StringWriter writer = new StringWriter();
         final PrintWriter printWriter = new PrintWriter(writer);
@@ -67,45 +75,11 @@ public class AndroidLogDebugOutput implements DebugOutput {
         return writer.toString();
     }
 
-    private interface LogInvoke {
-        void invoke(String tag, String message);
-    }
-
-    private static LogInvoke logInvoke(Level level) {
-        final LogInvoke invoke;
+    private static void log(@NonNull Level level, @NonNull String tag, @NonNull String message) {
         if (Level.WTF == level) {
-            invoke = new LogInvoke() {
-                @Override
-                public void invoke(String tag, String message) {
-                    Log.wtf(tag, message);
-                }
-            };
+            Log.wtf(tag, message);
         } else {
-            final int priority;
-            switch (level) {
-                case E:
-                    priority = Log.ERROR;
-                    break;
-                case W:
-                    priority = Log.WARN;
-                    break;
-                case I:
-                    priority = Log.INFO;
-                    break;
-                case V:
-                    priority = Log.VERBOSE;
-                    break;
-                default:
-                    priority = Log.DEBUG;
-                    break;
-            }
-            invoke = new LogInvoke() {
-                @Override
-                public void invoke(String tag, String message) {
-                    Log.println(priority, tag, message);
-                }
-            };
+            Log.println(7 - level.ordinal(), tag, message);
         }
-        return invoke;
     }
 }
