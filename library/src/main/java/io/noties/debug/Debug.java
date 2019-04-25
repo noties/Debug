@@ -1,4 +1,4 @@
-package ru.noties.debug;
+package io.noties.debug;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -8,12 +8,12 @@ import java.util.Collection;
 import java.util.Locale;
 import java.util.regex.Pattern;
 
-import static ru.noties.debug.Level.D;
-import static ru.noties.debug.Level.E;
-import static ru.noties.debug.Level.I;
-import static ru.noties.debug.Level.V;
-import static ru.noties.debug.Level.W;
-import static ru.noties.debug.Level.WTF;
+import static io.noties.debug.Level.D;
+import static io.noties.debug.Level.E;
+import static io.noties.debug.Level.I;
+import static io.noties.debug.Level.V;
+import static io.noties.debug.Level.W;
+import static io.noties.debug.Level.WTF;
 
 @SuppressWarnings({"WeakerAccess", "SameParameterValue"})
 public class Debug {
@@ -27,7 +27,7 @@ public class Debug {
     private static final String STARTING_MESSAGE_PATTERN_LINK = "%1$s(%2$s:%3$d)";
     private static final String TRACE_FIRST_LINE = "trace:\n";
 
-    private static final String DEFAULT_TAG = "ru.noties.Debug";
+    private static final String DEFAULT_TAG = "io.noties.Debug";
 
     private DebugOutput output;
 

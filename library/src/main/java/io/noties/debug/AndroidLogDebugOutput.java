@@ -1,4 +1,4 @@
-package ru.noties.debug;
+package io.noties.debug;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;

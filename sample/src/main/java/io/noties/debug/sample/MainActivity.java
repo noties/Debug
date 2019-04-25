@@ -1,4 +1,4 @@
-package ru.noties.debug.sample;
+package io.noties.debug.sample;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -6,7 +6,7 @@ import android.support.annotation.Nullable;
 
 import java.net.UnknownHostException;
 
-import ru.noties.debug.Debug;
+import io.noties.debug.Debug;
 
 public class MainActivity extends Activity {
 

@@ -7,7 +7,7 @@ android {
 
     defaultConfig {
 
-        applicationId "ru.noties.debug.sample"
+        applicationId "io.noties.debug.sample"
         minSdkVersion config['min-sdk']
         targetSdkVersion config['target-sdk']
         versionCode 1

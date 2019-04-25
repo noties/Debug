@@ -1,5 +1,5 @@
-<templateSet group="ru.noties.debug">
-  <template name="dii" value="ru.noties.debug.Debug.i($VAR$);" description="Debug.i() with methodParameters" toReformat="false" toShortenFQNames="true">
+<templateSet group="io.noties.debug">
+  <template name="dii" value="io.noties.debug.Debug.i($VAR$);" description="Debug.i() with methodParameters" toReformat="false" toShortenFQNames="true">
     <variable name="VAR" expression="groovyScript(&quot;def a = _1.collect{ it + \&quot;: %s\&quot;}.join(\&quot;, \&quot;); def b = _1.collect{it}.join(\&quot;, \&quot;); def c = '\&quot;' + a + '\&quot;, ' + b; c&quot;, methodParameters(" defaultValue="" alwaysStopAt="true" />
     <context>
       <option name="JAVA_EXPRESSION" value="true" />
@@ -7,58 +7,58 @@
       <option name="KOTLIN_EXPRESSION" value="false" />
     </context>
   </template>
-  <template name="dv" value="ru.noties.debug.Debug.v($END$);" description="Debug.v()" toReformat="false" toShortenFQNames="true">
+  <template name="dv" value="io.noties.debug.Debug.v($END$);" description="Debug.v()" toReformat="false" toShortenFQNames="true">
     <context>
       <option name="JAVA_EXPRESSION" value="true" />
       <option name="KOTLIN_EXPRESSION" value="true" />
     </context>
   </template>
-  <template name="di" value="ru.noties.debug.Debug.i($END$);" description="Debug.i();" toReformat="false" toShortenFQNames="true">
+  <template name="di" value="io.noties.debug.Debug.i($END$);" description="Debug.i();" toReformat="false" toShortenFQNames="true">
     <context>
       <option name="JAVA_EXPRESSION" value="true" />
       <option name="KOTLIN_EXPRESSION" value="true" />
     </context>
   </template>
-  <template name="de" value="ru.noties.debug.Debug.e($END$);" description="Debug.e();" toReformat="false" toShortenFQNames="true">
+  <template name="de" value="io.noties.debug.Debug.e($END$);" description="Debug.e();" toReformat="false" toShortenFQNames="true">
     <context>
       <option name="JAVA_EXPRESSION" value="true" />
       <option name="KOTLIN_EXPRESSION" value="true" />
     </context>
   </template>
-  <template name="dw" value="ru.noties.debug.Debug.w($END$);" description="Debug.w();" toReformat="false" toShortenFQNames="true">
+  <template name="dw" value="io.noties.debug.Debug.w($END$);" description="Debug.w();" toReformat="false" toShortenFQNames="true">
     <context>
       <option name="JAVA_EXPRESSION" value="true" />
       <option name="KOTLIN_EXPRESSION" value="true" />
     </context>
   </template>
-  <template name="dd" value="ru.noties.debug.Debug.d($END$);" description="Debug.d();" toReformat="false" toShortenFQNames="true">
+  <template name="dd" value="io.noties.debug.Debug.d($END$);" description="Debug.d();" toReformat="false" toShortenFQNames="true">
     <context>
       <option name="JAVA_EXPRESSION" value="true" />
       <option name="KOTLIN_EXPRESSION" value="true" />
     </context>
   </template>
-  <template name="ddd" value="ru.noties.debug.Debug.d($VAR$);" description="Debug.d() with methodParameters" toReformat="false" toShortenFQNames="true">
+  <template name="ddd" value="io.noties.debug.Debug.d($VAR$);" description="Debug.d() with methodParameters" toReformat="false" toShortenFQNames="true">
     <variable name="VAR" expression="groovyScript(&quot;def a = _1.collect{ it + \&quot;: %s\&quot;}.join(\&quot;, \&quot;); def b = _1.collect{it}.join(\&quot;, \&quot;); def c = '\&quot;' + a + '\&quot;, ' + b; c&quot;, methodParameters(" defaultValue="" alwaysStopAt="true" />
     <context>
       <option name="JAVA_EXPRESSION" value="true" />
       <option name="KOTLIN_EXPRESSION" value="false" />
     </context>
   </template>
-  <template name="dee" value="ru.noties.debug.Debug.e($VAR$);" description="Debug.e() withMethodParameters" toReformat="false" toShortenFQNames="true">
+  <template name="dee" value="io.noties.debug.Debug.e($VAR$);" description="Debug.e() withMethodParameters" toReformat="false" toShortenFQNames="true">
     <variable name="VAR" expression="groovyScript(&quot;def a = _1.collect{ it + \&quot;: %s\&quot;}.join(\&quot;, \&quot;); def b = _1.collect{it}.join(\&quot;, \&quot;); def c = '\&quot;' + a + '\&quot;, ' + b; c&quot;, methodParameters(" defaultValue="" alwaysStopAt="true" />
     <context>
       <option name="JAVA_EXPRESSION" value="true" />
       <option name="KOTLIN_EXPRESSION" value="false" />
     </context>
   </template>
-  <template name="dvv" value="ru.noties.debug.Debug.v($VAR$);" description="Debug.v() with methodParameters" toReformat="false" toShortenFQNames="true">
+  <template name="dvv" value="io.noties.debug.Debug.v($VAR$);" description="Debug.v() with methodParameters" toReformat="false" toShortenFQNames="true">
     <variable name="VAR" expression="groovyScript(&quot;def a = _1.collect{ it + \&quot;: %s\&quot;}.join(\&quot;, \&quot;); def b = _1.collect{it}.join(\&quot;, \&quot;); def c = '\&quot;' + a + '\&quot;, ' + b; c&quot;, methodParameters(" defaultValue="" alwaysStopAt="true" />
     <context>
       <option name="JAVA_EXPRESSION" value="true" />
       <option name="KOTLIN_EXPRESSION" value="false" />
     </context>
   </template>
-  <template name="dww" value="ru.noties.debug.Debug.w($VAR$);" description="Debug.w() with methodParameters" toReformat="false" toShortenFQNames="true">
+  <template name="dww" value="io.noties.debug.Debug.w($VAR$);" description="Debug.w() with methodParameters" toReformat="false" toShortenFQNames="true">
     <variable name="VAR" expression="groovyScript(&quot;def a = _1.collect{ it + \&quot;: %s\&quot;}.join(\&quot;, \&quot;); def b = _1.collect{it}.join(\&quot;, \&quot;); def c = '\&quot;' + a + '\&quot;, ' + b; c&quot;, methodParameters(" defaultValue="" alwaysStopAt="true" />
     <context>
       <option name="JAVA_EXPRESSION" value="true" />

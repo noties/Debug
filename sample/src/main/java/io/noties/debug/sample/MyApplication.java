@@ -1,4 +1,4 @@
-package ru.noties.debug.sample;
+package io.noties.debug.sample;
 
 import android.app.Application;
 
@@ -7,8 +7,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 
-import ru.noties.debug.AndroidLogDebugOutput;
-import ru.noties.debug.Debug;
+import io.noties.debug.AndroidLogDebugOutput;
+import io.noties.debug.Debug;
 
 
 public class MyApplication extends Application {

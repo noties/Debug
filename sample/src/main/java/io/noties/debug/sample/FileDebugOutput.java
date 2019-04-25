@@ -1,4 +1,4 @@
-package ru.noties.debug.sample;
+package io.noties.debug.sample;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -18,8 +18,8 @@ import java.util.Locale;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
-import ru.noties.debug.DebugOutput;
-import ru.noties.debug.Level;
+import io.noties.debug.DebugOutput;
+import io.noties.debug.Level;
 
 public class FileDebugOutput implements DebugOutput {
 

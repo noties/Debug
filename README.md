@@ -1,6 +1,6 @@
 # Debug
-[![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Debug-brightgreen.svg?style=flat)](https://android-arsenal.com/details/1/1038)
-[![Maven Central](https://img.shields.io/maven-central/v/ru.noties/debug.svg)](http://search.maven.org/#search|ga|1|g%3A%22ru.noties%22%20AND%20a%3A%22debug%22)
+
+[![Maven Central](https://img.shields.io/maven-central/v/io.noties/debug.svg)](http://search.maven.org/#search|ga|1|g%3A%22io.noties%22%20AND%20a%3A%22debug%22)
 
 Fast, easy and poweful logging utility for Android and Java.
 * Automatic tags based on Java class and method name, easy navigation to that call from IDE console output.
@@ -25,8 +25,7 @@ Quick peek on live templates:
 ## Installation
 In your `dependencies` block in `build.gradle`:
 ```gradle
-// the core library
-compile 'ru.noties:debug:4.0.0'
+implementation 'io.noties:debug:5.0.0'
 ```
 
 
@@ -44,7 +43,7 @@ Debug.init(outputs);
 
 If proguard is used this configuration can be used to remove all the log calls:
 ```proguard
--assumenosideeffects class ru.noties.debug.Debug {
+-assumenosideeffects class io.noties.debug.Debug {
     public static *** v(...);
     public static *** d(...);
     public static *** i(...);
@@ -104,7 +103,7 @@ Debug.trace(Level level, int maxStack);
 
 
 ## Live templates (IDEA)
-There is a file with basic templates: [templates_ru_noties_debug.xml](templates_ru_noties_debug.xml).
+There is a file with basic templates: [templates_io_noties_debug.xml](templates_io_noties_debug.xml).
 
 [Learn how to add custom live templates to a IDEA IDE](https://www.jetbrains.com/help/idea/2016.3/live-templates.html)
 
@@ -152,7 +151,11 @@ public interface DebugOutput {
 ```
 Just implement `DebugOutput` and pass an instance of it to the `Debug.init` call
 
-## Changes in version 4.0.0
+## Changes 5.0.0
+* Maven artifact location change: `ru.noties:debug` -&gt; `io.noties:debug`
+* Package change `ru.noties.debug` -&gt; `io.noties.debug`
+
+### Changes in version 4.0.0
 * Removed `debug-remove` aftifact
 * Added nullability annotations where matter
 * Overloaded some logging methods to not create an array of arguments with each call
@@ -168,7 +171,7 @@ Just implement `DebugOutput` and pass an instance of it to the `Debug.init` call
 * `ru.noties.debug.out.DebugOutput` -> `ru.noties.debug.DebugOutput`
 * `ru.noties.debug.out.AndroidLogDebugOutput` -> `ru.noties.debug.AndroidLogDebugOutput`
 * All `Debug.*` calls now accept an array of arguments (previously one would have to create a formatted string for that: `Debug.i("%d, %d, %d, %d", 2, 3, 4, 5);`, now: `Debug.i(2, 3, 4, 5);`
-* Added `ru.noties.debug.SystemOutDebugOutput` for writing logs to `System.out` & `System.err` (can be used in plain Java projects, or in test environment)
+* Added `io.noties.debug.SystemOutDebugOutput` for writing logs to `System.out` & `System.err` (can be used in plain Java projects, or in test environment)
 * Removed Timer
 * Removed `library-ui` module (discountinued)
 * Removed `apt-compiler` & `apt-annotations` modules (discontinued)
@@ -176,7 +179,7 @@ Just implement `DebugOutput` and pass an instance of it to the `Debug.init` call
 ## License
 
 ```
-  Copyright 2017 Dimitry Ivanov (mail@dimitryivanov.ru)
+  Copyright 2017 Dimitry Ivanov (legal@noties.io)
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
