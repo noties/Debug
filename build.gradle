@@ -4,7 +4,7 @@ buildscript {
         google()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.0.1'
+        classpath 'com.android.tools.build:gradle:3.4.1'
     }
 }
 
@@ -18,7 +18,7 @@ allprojects {
 }
 
 wrapper {
-    gradleVersion '4.10'
+    gradleVersion '5.5'
     distributionType 'all'
 }
 
@@ -33,14 +33,14 @@ if (hasProperty('local')) {
 ext {
 
     config = [
-            'target-sdk'     : 27,
+            'target-sdk'     : 28,
             'min-sdk'        : 8,
-            'build-tools'    : '27.0.3',
+            'build-tools'    : '28.0.3',
             'push-aar-gradle': 'https://raw.githubusercontent.com/noties/gradle-mvn-push/master/gradle-mvn-push-aar.gradle'
     ]
 
     deps = [
-            'support-annotations': 'com.android.support:support-annotations:27.1.1'
+            'annotations': 'androidx.annotation:annotation:1.1.0'
     ]
 
     deps['test'] = [
