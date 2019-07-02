@@ -1,0 +1,24 @@
+apply plugin: 'java-library'
+
+jar {
+    manifest {
+        attributes('Lint-Registry-v2': 'io.noties.debug.lint.DebugLintRegistry')
+    }
+}
+
+//configurations {
+//    lintChecks
+//}
+
+dependencies {
+
+    final def lint_version = '26.4.1'
+
+    compileOnly "com.android.tools.lint:lint-api:$lint_version"
+    compileOnly "com.android.tools.lint:lint-checks:$lint_version"
+
+//    lintChecks files(jar)
+}
+
+sourceCompatibility = "1.7"
+targetCompatibility = "1.7"

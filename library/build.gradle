@@ -12,19 +12,11 @@ android {
     }
 }
 
-task jar(type: Jar) {
-    from 'build/intermediates/classes/release'
-    exclude '**/BuildConfig.class'
-    exclude '**/R.class'
-}
-
-artifacts {
-    archives jar
-}
-
 dependencies {
 
     api deps['annotations']
+
+    lintPublish project(':library-lint')
 
     testImplementation deps.test.junit
 }
@@ -33,3 +25,8 @@ if (project.hasProperty('release')) {
     apply from: config['push-aar-gradle']
 }
 
+// okay, we are at this state again when BuildConfig is generated no matter what...
+//afterEvaluate {
+//    tasks.named('generateDebugBuildConfig').configure { it.enabled = false }
+//    tasks.named('generateReleaseBuildConfig').configure { it.enabled = false }
+//}

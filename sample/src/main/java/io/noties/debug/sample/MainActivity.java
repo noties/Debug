@@ -23,6 +23,9 @@ public class MainActivity extends Activity {
         Debug.e(true, null, Integer.MAX_VALUE, Long.MIN_VALUE);
         Debug.wtf("No, really, WTF?!");
 
+        // lint in action
+        Debug.i("%d", false);
+
         Debug.i("array: %s", new int[]{1, 2, 3, 4, 5});
 
         // Trace current method calls chain
