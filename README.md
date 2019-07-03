@@ -25,7 +25,7 @@ Quick peek on live templates:
 ## Installation
 In your `dependencies` block in `build.gradle`:
 ```gradle
-implementation 'io.noties:debug:5.0.0'
+implementation 'io.noties:debug:5.1.0'
 ```
 
 
@@ -151,7 +151,11 @@ public interface DebugOutput {
 ```
 Just implement `DebugOutput` and pass an instance of it to the `Debug.init` call
 
-## Changes 5.0.0
+## Changes 5.1.0
+* Added a simple lint check for correct pattern/arguments
+* Migrated to androidx (annotations)
+
+### Changes 5.0.0
 * Maven artifact location change: `ru.noties:debug` -&gt; `io.noties:debug`
 * Package change `ru.noties.debug` -&gt; `io.noties.debug`
 
