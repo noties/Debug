@@ -1,0 +1,5 @@
+platform :ios, '15.0'
+
+target 'DebugSample' do
+  pod 'shared', :path => '../../shared/shared.podspec'
+end
