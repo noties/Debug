@@ -10,5 +10,5 @@ plugins {
 
 allprojects {
     version = "6.0-SNAPSHOT"
-    group = "io.noties.debug"
+    group = "io.noties"
 }
