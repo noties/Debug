@@ -1,6 +1,6 @@
 Pod::Spec.new do |spec|
     spec.name                     = 'shared'
-    spec.version                  = '1.0'
+    spec.version                  = '6.0-SNAPSHOT'
     spec.homepage                 = 'https://github.com/noties/Debug'
     spec.source                   = { :http=> ''}
     spec.authors                  = ''

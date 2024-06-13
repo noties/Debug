@@ -4,6 +4,8 @@ plugins {
     alias(libs.plugins.androidLibrary)
 }
 
+apply(from = "./publish.gradle")
+
 kotlin {
     androidTarget {
         compilations.all {
@@ -22,7 +24,7 @@ kotlin {
     cocoapods {
         summary = "Logging solution"
         homepage = "https://github.com/noties/Debug"
-        version = "1.0"
+        version = project.version as String
         ios.deploymentTarget = "15.0"
         framework {
             baseName = "KMPDebug"
