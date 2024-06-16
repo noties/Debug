@@ -2,12 +2,18 @@ plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.kotlinCocoapods)
     alias(libs.plugins.androidLibrary)
+//    alias(libs.plugins.kotlinJvm)
 }
 
+// at least it somehow works, `.kts` is just a plain file
+//  that requires also a lot of workarounds
 apply(from = "./publish.gradle")
 
 kotlin {
     androidTarget {
+        // publishes also `debug` variant.. :'( but at least it publishes android at all
+//        publishAllLibraryVariants()
+        publishLibraryVariants("release")
         compilations.all {
             kotlinOptions {
                 jvmTarget = "1.8"

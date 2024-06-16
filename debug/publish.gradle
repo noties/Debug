@@ -1,6 +1,11 @@
 final def isRelease = project.hasProperty('release')
 final def isSnapshot = project.hasProperty('snapshot')
 
+/*
+WHAT THE HELL?
+Multiple publications with coordinates 'io.noties:debug:6.0-SNAPSHOT' are published to repository 'maven'. The publications 'kotlinMultiplatform' in project ':debug' and 'release' in project ':debug' will overwrite each other!
+ */
+
 if (isRelease || isSnapshot) {
 
     final String version = project.version
@@ -15,10 +20,14 @@ if (isRelease || isSnapshot) {
     apply plugin: 'signing'
 
     afterEvaluate {
+
         publishing {
 
             publications {
                 release(MavenPublication) {
+                    // do not change ot `named` fails with error
+//                    from components.findByName('release')
+
                     groupId group
                     artifactId POM_ARTIFACT_ID
                     it.version version
@@ -50,16 +59,14 @@ if (isRelease || isSnapshot) {
                             }
                         }
                     }
-
-                    from components.findByName('release')
                 }
             }
 
             repositories {
                 // local repository - in a directory
-//                maven {
-//                    url "$rootDir/repo"
-//                }
+                maven {
+                    url "$rootDir/repo"
+                }
 
                 // sonatype
                 maven {
