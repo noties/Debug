@@ -1,6 +1,6 @@
 package io.noties.debug
 
-fun Debug.Companion.mock(): DebugOutputMock {
+fun Debug.shared.mock(): DebugOutputMock {
     val mock = DebugOutputMock()
     configure { output(mock) }
     return mock
