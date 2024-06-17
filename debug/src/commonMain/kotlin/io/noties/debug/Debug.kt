@@ -1,5 +1,7 @@
 package io.noties.debug
 
+import kotlin.jvm.JvmStatic
+
 interface Debug {
     // current tag, null if root
     val tag: String?
@@ -20,7 +22,9 @@ interface Debug {
 
     fun log(level: DebugLogLevel, vararg message: Any?)
 
-    companion object: Debug by impl {
+    @Suppress("ClassName")
+    companion object shared: Debug by impl {
+        @JvmStatic
         fun configure(configuration: DebugConfiguration.() -> Unit): Debug {
             val impl = DebugConfigurationImpl()
             configuration(impl)
