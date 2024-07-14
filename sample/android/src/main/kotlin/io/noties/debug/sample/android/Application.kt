@@ -71,5 +71,13 @@ class Application : Application() {
             true,
             IllegalArgumentException("The last, but not least")
         )
+
+        // line length
+        (0 until 10000)
+            .map { it }
+            .joinToString(" ")
+            .also {
+                Debug.w("Line length:", it)
+            }
     }
 }
